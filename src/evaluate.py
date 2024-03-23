@@ -3,6 +3,7 @@ from pathlib import Path
 
 import numpy as np
 import torch
+import os
 
 from helpers import init_helper, data_helper, vsumm_helper, bbox_helper
 from modules.model_zoo import get_model
