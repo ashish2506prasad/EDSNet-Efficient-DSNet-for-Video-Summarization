@@ -22,6 +22,18 @@ class DSNet(nn.Module):
             nn.Linear(num_feature, num_hidden),
             nn.Tanh(),
             nn.Dropout(0.5),
+            nn.LayerNorm(num_hidden),
+            nn.Linear(num_hidden, num_hidden),
+            nn.Tanh(),
+            nn.Dropout(0.5),
+            nn.LayerNorm(num_hidden),
+            nn.Linear(num_hidden, num_hidden),
+            nn.Tanh(),
+            nn.Dropout(0.5),
+            nn.LayerNorm(num_hidden),
+            nn.Linear(num_hidden, num_hidden),
+            nn.Tanh(),
+            nn.Dropout(0.5),
             nn.LayerNorm(num_hidden)
         )
         self.fc_cls = nn.Linear(num_hidden, 1)
