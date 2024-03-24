@@ -22,20 +22,12 @@ class DSNet(nn.Module):
             nn.Linear(num_feature, num_hidden),
             nn.Tanh(),
             nn.Dropout(0.5),
-            nn.LayerNorm(num_hidden),
-            nn.Linear(num_hidden, num_hidden),
-            nn.Tanh(),
-            nn.Dropout(0.5),
-            nn.LayerNorm(num_hidden),
-            nn.Linear(num_hidden, num_hidden),
-            nn.Tanh(),
-            nn.Dropout(0.5),
-            nn.LayerNorm(num_hidden),
-            nn.Linear(num_hidden, num_hidden),
-            nn.Tanh(),
-            nn.Dropout(0.5),
             nn.LayerNorm(num_hidden)
         )
+        self.fc2 = nn.Sequential(nn.Linear(num_hidden, num_hidden),
+            nn.Tanh(),
+            nn.Dropout(0.5),
+            nn.LayerNorm(num_hidden))
         self.fc_cls = nn.Linear(num_hidden, 1)
         self.fc_loc = nn.Linear(num_hidden, 2)
 
@@ -49,7 +41,7 @@ class DSNet(nn.Module):
         pool_results = [roi_pooling(out) for roi_pooling in self.roi_poolings]
         out = torch.cat(pool_results, dim=0).permute(2, 0, 1)[:-1]
 
-        out = self.fc1(out)
+        out = self.fc2(self.fc1(out))
 
         pred_cls = self.fc_cls(out).sigmoid().view(seq_len, self.num_scales)
         pred_loc = self.fc_loc(out).view(seq_len, self.num_scales, 2)

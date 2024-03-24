@@ -85,6 +85,8 @@ def train(args, split, save_path):
             seq = torch.tensor(seq, dtype=torch.float32).unsqueeze(0).to(args.device)
 
             pred_cls, pred_loc = model(seq)
+            print(pred_cls.shape, pred_loc.shape)
+            logger.info(f'pred_cls: {pred_cls.shape}, pred_loc: {pred_loc.shape}')
 
             loc_loss = calc_loc_loss(pred_loc, loc_label, cls_label)
             cls_loss = calc_cls_loss(pred_cls, cls_label)
