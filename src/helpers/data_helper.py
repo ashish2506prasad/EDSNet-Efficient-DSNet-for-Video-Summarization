@@ -42,7 +42,7 @@ class VideoDataset(object):
     @staticmethod
     def get_datasets(keys: List[str]) -> Dict[str, h5py.File]:
         dataset_paths = {str(Path(key).parent) for key in keys}
-        datasets = {path: h5py.File(os.path.join('/kaggle/working/DSNet_Kaggle','/'.join(path.split('/')[1:])   ), 'r') for path in dataset_paths}
+        datasets = {path: h5py.File(os.path.join('/kaggle/input/vid-features','/'.join(path.split('/')[1:])   ), 'r') for path in dataset_paths}
         return datasets
 
 
