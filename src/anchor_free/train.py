@@ -75,8 +75,14 @@ def train(args, split, save_path):
             max_val_fscore = val_fscore
             torch.save(model.state_dict(), str(save_path))
 
-        logger.info(f'Epoch: {epoch}/{args.max_epoch} '
-                    f'Loss: {stats.cls_loss:.4f}/{stats.loc_loss:.4f}/{stats.ctr_loss:.4f}/{stats.loss:.4f} '
-                    f'F-score cur/max: {val_fscore:.4f}/{max_val_fscore:.4f}')
+        if args.where == 'local':
+            logger.info(f'Epoch: {epoch}/{args.max_epoch} '
+                        f'Loss: {stats.cls_loss:.4f}/{stats.loc_loss:.4f}/{stats.loss:.4f} '
+                        f'F-score cur/max: {val_fscore:.4f}/{max_val_fscore:.4f}')
+        else:
+            print(f'Epoch: {epoch}/{args.max_epoch} '
+                        f'Loss: {stats.cls_loss:.4f}/{stats.loc_loss:.4f}/{stats.loss:.4f} '
+                        f'F-score cur/max: {val_fscore:.4f}/{max_val_fscore:.4f}')
+
 
     return max_val_fscore
