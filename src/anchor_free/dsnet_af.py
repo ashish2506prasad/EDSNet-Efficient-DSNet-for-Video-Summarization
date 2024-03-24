@@ -15,17 +15,15 @@ class DSNetAF(nn.Module):
             nn.ReLU(inplace=True),
             nn.Dropout(0.5),
             nn.LayerNorm(num_hidden),
-            nn.Linear(num_feature, 2*num_hidden),
+            nn.Linear(num_hidden, 2*num_hidden),
             nn.ReLU(inplace=True),
             nn.Dropout(0.5),
-            nn.LayerNorm(2*num_hidden)
-        )
-        self.fc2 = nn.Sequential(
+            nn.LayerNorm(2*num_hidden),
             nn.Linear(2*num_hidden, num_hidden),
             nn.ReLU(inplace=True),
             nn.Dropout(0.5),
-            nn.LayerNorm(num_hidden)
-        )
+            nn.LayerNorm(num_hidden))
+        
         self.fc_cls = nn.Linear(num_hidden, 1)
         self.fc_loc = nn.Linear(num_hidden, 2)
         self.fc_ctr = nn.Linear(num_hidden, 1)
@@ -37,7 +35,7 @@ class DSNetAF(nn.Module):
         out = out + x
         out = self.layer_norm(out)
 
-        out = self.fc2(self.fc1(out))
+        out = self.fc1(out)
 
         pred_cls = self.fc_cls(out).sigmoid().view(seq_len)
         pred_loc = self.fc_loc(out).exp().view(seq_len, 2)

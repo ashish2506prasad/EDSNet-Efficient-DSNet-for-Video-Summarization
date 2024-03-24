@@ -3,7 +3,8 @@ from os import PathLike
 from pathlib import Path
 from typing import Any, List, Dict
 import os
-
+import logging
+from helpers import init_helper 
 import h5py
 import numpy as np
 import yaml
@@ -12,7 +13,8 @@ import yaml
 class VideoDataset(object):
     def __init__(self, keys: List[str]):
         self.keys = keys
-        self.datasets = self.get_datasets(keys)
+        args = init_helper.get_arguments()
+        self.datasets = self.get_datasets(keys, args.where)
 
     def __getitem__(self, index):
         key = self.keys[index]
@@ -40,11 +42,15 @@ class VideoDataset(object):
         return len(self.keys)
 
     @staticmethod
-    def get_datasets(keys: List[str]) -> Dict[str, h5py.File]:
-        dataset_paths = {str(Path(key).parent) for key in keys}
-        datasets = {path: h5py.File(os.path.join('/kaggle/input/vid-features','/'.join(path.split('/')[2:])   ), 'r') for path in dataset_paths}
-        return datasets
-
+    def get_datasets(keys: List[str], where) -> Dict[str, h5py.File]:
+        if where == 'kaggle':
+            dataset_paths = {str(Path(key).parent) for key in keys}
+            datasets = {path: h5py.File(os.path.join('/kaggle/input/vid-features','/'.join(path.split('/')[2:])   ), 'r') for path in dataset_paths}
+            return datasets
+        elif where == 'local':
+            dataset_paths = {str(Path(key).parent) for key in keys}
+            datasets = {path: h5py.File(os.path.join('DSNet_Kaggle',path), 'r') for path in dataset_paths}
+            return datasets
 
 class DataLoader(object):
     def __init__(self, dataset: VideoDataset, shuffle: bool):

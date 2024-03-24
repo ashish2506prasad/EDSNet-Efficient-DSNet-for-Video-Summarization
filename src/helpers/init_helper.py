@@ -77,6 +77,8 @@ def get_parser() -> argparse.ArgumentParser:
                         choices=['focal', 'cross-entropy'])
     parser.add_argument('--reg-loss', type=str, default='soft-iou',
                         choices=['soft-iou', 'smooth-l1'])
+    
+    parser.add_argument('--where', type=str, choices = ['kaggle', 'local'], default = 'local')
 
     return parser
 
