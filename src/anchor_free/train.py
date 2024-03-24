@@ -50,9 +50,6 @@ def train(args, split, save_path):
             ctr_label = anchor_free_helper.get_ctr_label(target, loc_label)
 
             pred_cls, pred_loc, pred_ctr = model(seq)
-            # print(pred_cls.shape)
-            # print(pred_loc.shape) 
-            # print(pred_ctr.shape)
 
             cls_label = torch.tensor(cls_label, dtype=torch.float32).to(args.device)
             loc_label = torch.tensor(loc_label, dtype=torch.float32).to(args.device)
