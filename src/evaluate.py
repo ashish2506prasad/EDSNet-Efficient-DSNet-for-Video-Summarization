@@ -72,6 +72,8 @@ def main():
 
         logger.info(f'{split_path.stem}: diversity: {stats.diversity:.4f}, '
                     f'F-score: {stats.fscore:.4f}')
+        print(f'{split_path.stem}: diversity: {stats.diversity:.4f}, '
+                    f'F-score: {stats.fscore:.4f}')
 
 
 if __name__ == '__main__':
