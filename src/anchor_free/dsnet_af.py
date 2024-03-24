@@ -14,10 +14,14 @@ class DSNetAF(nn.Module):
             nn.Linear(num_feature, num_hidden),
             nn.ReLU(inplace=True),
             nn.Dropout(0.5),
-            nn.LayerNorm(num_hidden)
+            nn.LayerNorm(num_hidden),
+            nn.Linear(num_feature, 2*num_hidden),
+            nn.ReLU(inplace=True),
+            nn.Dropout(0.5),
+            nn.LayerNorm(2*num_hidden)
         )
         self.fc2 = nn.Sequential(
-            nn.Linear(num_hidden, num_hidden),
+            nn.Linear(2*num_hidden, num_hidden),
             nn.ReLU(inplace=True),
             nn.Dropout(0.5),
             nn.LayerNorm(num_hidden)

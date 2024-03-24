@@ -22,9 +22,13 @@ class DSNet(nn.Module):
             nn.Linear(num_feature, num_hidden),
             nn.Tanh(),
             nn.Dropout(0.5),
-            nn.LayerNorm(num_hidden)
+            nn.LayerNorm(num_hidden),
+            nn.Linear(num_feature, 2*num_hidden),
+            nn.Tanh(),
+            nn.Dropout(0.5),
+            nn.LayerNorm(2*num_hidden)
         )
-        self.fc2 = nn.Sequential(nn.Linear(num_hidden, num_hidden),
+        self.fc2 = nn.Sequential(nn.Linear(2*num_hidden, num_hidden),
             nn.Tanh(),
             nn.Dropout(0.5),
             nn.LayerNorm(num_hidden))
