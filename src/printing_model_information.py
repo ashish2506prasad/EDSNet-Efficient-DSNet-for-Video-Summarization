@@ -6,12 +6,12 @@ import torch
 from torch import nn
 from helpers import init_helper, data_helper
 from anchor_based import anchor_helper
-from anchor_based.dsnet import DSNet
+from anchor_based.dsnet import DSNet, DSNet_DeepAttention
 from evaluate import evaluate
 from helpers import data_helper, vsumm_helper, bbox_helper
 from torchinfo import summary
 
-from anchor_free.dsnet_af import DSNetAF
+from anchor_free.dsnet_af import DSNetAF, DSNetAF_DeepAttention
 logger = logging.getLogger()
 
 
@@ -30,13 +30,26 @@ def tuple_dimensions(t):
 def model_summary(model):
     if model == 'anchor-based':
         print("printing model summary (anchor based): ")
-        summary(DSNet(base_model=args.base_model, num_feature=args.num_feature,
+        if args.depth == 'shallow':
+            print("printing model summary (shallow): ")
+            summary(DSNet(base_model=args.base_model, num_feature=args.num_feature,
+                    num_hidden=args.num_hidden, anchor_scales=args.anchor_scales,
+                    num_head=args.num_head))
+        else:
+            print("printing model summary (deep attention): ")
+            summary(DSNet_DeepAttention(base_model=args.base_model, num_feature=args.num_feature,
                     num_hidden=args.num_hidden, anchor_scales=args.anchor_scales,
                     num_head=args.num_head))
     
     elif model == 'anchor-free':
         print("printing model summary (anchor free): ")
-        summary(DSNetAF(base_model=args.base_model, num_feature=args.num_feature,
+        if args.depth == 'shallow':
+            print("printing model summary (shallow): ")
+            summary(DSNetAF(base_model=args.base_model, num_feature=args.num_feature,
+                    num_hidden=args.num_hidden, num_head=args.num_head))
+        else:
+            print("printing model summary (deep attention): ")
+            summary(DSNetAF_DeepAttention(base_model=args.base_model, num_feature=args.num_feature,
                     num_hidden=args.num_hidden, num_head=args.num_head))
     else:
         raise ValueError(f'Invalid model type: {model}')
