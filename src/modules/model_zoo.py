@@ -1,14 +1,25 @@
-from anchor_based.dsnet import DSNet
-from anchor_free.dsnet_af import DSNetAF
+from anchor_based.dsnet import DSNet, DSNet_DeepAttention
+from anchor_free.dsnet_af import DSNetAF, DSNetAF_DeepAttention
+from helpers import init_helper, data_helper
 
 
 def get_anchor_based(base_model, num_feature, num_hidden, anchor_scales,
                      num_head, **kwargs):
-    return DSNet(base_model, num_feature, num_hidden, anchor_scales, num_head)
+    args = init_helper.get_arguments()
+    if args.model_depth == 'shallow':
+        return DSNet(base_model, num_feature, num_hidden, anchor_scales, num_head)
+    else:
+        return DSNet_DeepAttention(base_model, num_feature, num_hidden, anchor_scales, num_head)
+    
+
 
 
 def get_anchor_free(base_model, num_feature, num_hidden, num_head, **kwargs):
-    return DSNetAF(base_model, num_feature, num_hidden, num_head)
+    args = init_helper.get_arguments()
+    if args.model_depth == 'shallow':
+        return DSNetAF(base_model, num_feature, num_hidden, num_head)
+    else:
+        return DSNetAF_DeepAttention(base_model, num_feature, num_hidden, num_head)
 
 
 def get_model(model_type, **kwargs):
