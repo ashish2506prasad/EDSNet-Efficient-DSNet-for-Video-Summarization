@@ -110,6 +110,7 @@ class LSTMExtractor(nn.LSTM):
         return out
 
 
+
 def build_base_model(base_type: str,
                      num_feature: int,
                      num_head: int

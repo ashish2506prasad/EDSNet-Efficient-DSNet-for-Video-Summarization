@@ -3,7 +3,7 @@ import logging
 import torch
 
 from anchor_free import anchor_free_helper
-from anchor_free.dsnet_af import DSNetAF
+from anchor_free.dsnet_af import DSNetAF, DSNetAF_DeepAttention
 from anchor_free.losses import calc_ctr_loss, calc_cls_loss, calc_loc_loss
 from evaluate import evaluate
 from helpers import data_helper, vsumm_helper
@@ -12,8 +12,13 @@ logger = logging.getLogger()
 
 
 def train(args, split, save_path):
-    model = DSNetAF(base_model=args.base_model, num_feature=args.num_feature,
+    if args.depth == 'shallow':
+        model = DSNetAF(base_model=args.base_model, num_feature=args.num_feature,
+                        num_hidden=args.num_hidden, num_head=args.num_head)
+    else:
+        model = DSNetAF_DeepAttention(base_model=args.base_model, num_feature=args.num_feature,
                     num_hidden=args.num_hidden, num_head=args.num_head)
+        
     model = model.to(args.device)
 
     model.train()
