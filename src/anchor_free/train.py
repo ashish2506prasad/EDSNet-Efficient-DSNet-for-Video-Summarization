@@ -12,7 +12,7 @@ logger = logging.getLogger()
 
 
 def train(args, split, save_path):
-    if args.depth == 'shallow':
+    if args.model_depth == 'shallow':
         model = DSNetAF(base_model=args.base_model, num_feature=args.num_feature,
                         num_hidden=args.num_hidden, num_head=args.num_head)
     else:

@@ -30,7 +30,7 @@ def tuple_dimensions(t):
 def model_summary(model):
     if model == 'anchor-based':
         print("printing model summary (anchor based): ")
-        if args.depth == 'shallow':
+        if args.model_depth == 'shallow':
             print("printing model summary (shallow): ")
             summary(DSNet(base_model=args.base_model, num_feature=args.num_feature,
                     num_hidden=args.num_hidden, anchor_scales=args.anchor_scales,
@@ -43,7 +43,7 @@ def model_summary(model):
     
     elif model == 'anchor-free':
         print("printing model summary (anchor free): ")
-        if args.depth == 'shallow':
+        if args.model_depth == 'shallow':
             print("printing model summary (shallow): ")
             summary(DSNetAF(base_model=args.base_model, num_feature=args.num_feature,
                     num_hidden=args.num_hidden, num_head=args.num_head))

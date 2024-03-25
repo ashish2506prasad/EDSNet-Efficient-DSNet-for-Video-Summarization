@@ -22,7 +22,7 @@ def xavier_init(module):
 
 
 def train(args, split, save_path):
-    if args.depth == 'shallow':
+    if args.model_depth == 'shallow':
         model = DSNet(base_model=args.base_model, num_feature=args.num_feature,
                     num_hidden=args.num_hidden, anchor_scales=args.anchor_scales,
                     num_head=args.num_head)
