@@ -61,7 +61,7 @@ def get_parser() -> argparse.ArgumentParser:
     parser.add_argument('--num-head', type=int, default=8)
     parser.add_argument('--num-feature', type=int, default=1024)
     parser.add_argument('--num-hidden', type=int, default=128)
-    parser.add_argument('--depth', type=str, default='shallow',
+    parser.add_argument('--model-depth', type=str, default='shallow',
                         choices=['shallow', 'deep'])
     # anchor based
     parser.add_argument('--neg-sample-ratio', type=float, default=2.0)
