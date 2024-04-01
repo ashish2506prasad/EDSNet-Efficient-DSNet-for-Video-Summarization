@@ -15,10 +15,6 @@ import os
 
 logger = logging.getLogger()
 
-def ends_with_mp4(path):
-    _, extension = os.path.splitext(path)
-    return extension.lower() == '.mp4' 
-
 
 class FeatureExtractor(object):
     def __init__(args, self):
