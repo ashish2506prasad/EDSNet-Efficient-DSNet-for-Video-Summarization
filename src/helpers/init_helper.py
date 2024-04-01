@@ -36,6 +36,8 @@ def get_parser() -> argparse.ArgumentParser:
                         choices=('anchor-based', 'anchor-free'))
     parser.add_argument('--model-depth', type=str, default='shallow',
                         choices=['shallow', 'deep'])
+    parser.add_argument('--feature-extractor', type=str, default='google net', 
+                        choices=['google net', 'convnext', 'swin transfromer'])
 
     # training & evaluation
     parser.add_argument('--device', type=str, default='cuda',
@@ -63,6 +65,8 @@ def get_parser() -> argparse.ArgumentParser:
     parser.add_argument('--num-head', type=int, default=8)
     parser.add_argument('--num-feature', type=int, default=1024)
     parser.add_argument('--num-hidden', type=int, default=128)
+    parser.add_argument('--feature-extractor', type=str, default='google-net',
+                        choices=['google-net', 'swin-transformer', 'convnext'])
     
     # anchor based
     parser.add_argument('--neg-sample-ratio', type=float, default=2.0)

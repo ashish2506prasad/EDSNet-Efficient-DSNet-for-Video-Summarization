@@ -61,6 +61,7 @@ class DSNetAF_DeepAttention(nn.Module):
     def __init__(self, base_model, num_feature, num_hidden, num_head):
         super().__init__()
         self.base_model1 = build_base_model(base_model, num_feature, num_head//2)
+        self.fc = nn.Linear(num_feature, num_feature)
         self.base_model2 = build_base_model(base_model, num_feature, num_head)
 
         self.layer_norm = nn.LayerNorm(num_feature)
@@ -77,7 +78,12 @@ class DSNetAF_DeepAttention(nn.Module):
             nn.Linear(2*num_hidden, num_hidden),
             nn.ReLU(inplace=True),
             nn.Dropout(0.5),
-            nn.LayerNorm(num_hidden))
+            nn.LayerNorm(num_hidden),
+            nn.Linear(num_hidden, num_hidden),
+            nn.ReLU(inplace=True),
+            nn.Dropout(0.5),
+            nn.LayerNorm(num_hidden)
+            )
         
         self.fc_cls = nn.Linear(num_hidden, 1)
         self.fc_loc = nn.Linear(num_hidden, 2)

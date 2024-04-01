@@ -93,6 +93,10 @@ class DSNet_DeepAttention(nn.Module):
             nn.Linear(2*num_hidden, num_hidden),
             nn.Tanh(),
             nn.Dropout(0.5),
+            nn.LayerNorm(num_hidden),
+            nn.Linear(num_hidden, num_hidden),
+            nn.Tanh(),
+            nn.Dropout(0.5),
             nn.LayerNorm(num_hidden)
         )
         self.fc_cls = nn.Linear(num_hidden, 1)
