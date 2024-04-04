@@ -6,7 +6,7 @@ import torch
 from torch import nn
 from helpers import init_helper, data_helper
 from anchor_based import anchor_helper
-from anchor_based.dsnet import DSNet, DSNet_DeepAttention
+from anchor_based.dsnet import DSNet, DSNet_DeepAttention, DSNet_MultiAttention
 from evaluate import evaluate
 from helpers import data_helper, vsumm_helper, bbox_helper
 from torchinfo import summary
@@ -35,11 +35,19 @@ def model_summary(model):
             summary(DSNet(base_model=args.base_model, num_feature=args.num_feature,
                     num_hidden=args.num_hidden, anchor_scales=args.anchor_scales,
                     num_head=args.num_head))
-        else:
+        elif args.model_depth == 'deep':
             print("printing model summary (deep attention): ")
             summary(DSNet_DeepAttention(base_model=args.base_model, num_feature=args.num_feature,
                     num_hidden=args.num_hidden, anchor_scales=args.anchor_scales,
                     num_head=args.num_head))
+        elif args.model_depth == 'local-global-attention':
+            print("printing model summary (local-global-attention): ")
+            summary(DSNet_MultiAttention(base_model=args.base_model, num_feature=args.num_feature,
+                    num_hidden=args.num_hidden, anchor_scales=args.anchor_scales,
+                    num_head=args.num_head))
+        else:
+            raise ValueError(f'Invalid model type: {model}')
+
     
     elif model == 'anchor-free':
         print("printing model summary (anchor free): ")
@@ -47,45 +55,16 @@ def model_summary(model):
             print("printing model summary (shallow): ")
             summary(DSNetAF(base_model=args.base_model, num_feature=args.num_feature,
                     num_hidden=args.num_hidden, num_head=args.num_head))
-        else:
+        elif args.model_depth == 'deep':
             print("printing model summary (deep attention): ")
             summary(DSNetAF_DeepAttention(base_model=args.base_model, num_feature=args.num_feature,
                     num_hidden=args.num_hidden, num_head=args.num_head))
+        else:
+            raise ValueError(f'Invalid model type: {model}')
     else:
         raise ValueError(f'Invalid model type: {model}')
     
     return
-
-def input_dimensions(split):
-
-    for split_path in args.splits:
-            split_path = Path(split_path)
-            splits = data_helper.load_yaml(split_path)
-
-
-            for split_idx, split in enumerate(splits):
-                logger.info(f'Start training on {split_path.stem}: split {split_idx}')
-
-                train_set = data_helper.VideoDataset(split['train_keys'])
-                train_loader = data_helper.DataLoader(train_set, shuffle=True)
-                ## printing the training loader
-                for a, seq, gtscore, cps, n_frames, nfps, picks, b in train_loader:
-                    print("printing the train loader: ")
-                    # print(a.shape)
-                    print(seq.shape)
-                    print(gtscore.shape)
-                    print(cps.shape)
-                    print(n_frames.shape)
-                    print(nfps.shape)
-                    print(picks.shape)
-                    print(b.shape)
-                    break
-                
-        
-    return
-    
-
-
 
 
 if __name__ == '__main__':

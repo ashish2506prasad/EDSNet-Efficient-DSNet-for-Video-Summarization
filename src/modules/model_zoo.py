@@ -1,4 +1,4 @@
-from anchor_based.dsnet import DSNet, DSNet_DeepAttention
+from anchor_based.dsnet import DSNet, DSNet_DeepAttention, DSNet_MultiAttention
 from anchor_free.dsnet_af import DSNetAF, DSNetAF_DeepAttention
 from helpers import init_helper, data_helper
 
@@ -8,8 +8,10 @@ def get_anchor_based(base_model, num_feature, num_hidden, anchor_scales,
     args = init_helper.get_arguments()
     if args.model_depth == 'shallow':
         return DSNet(base_model, num_feature, num_hidden, anchor_scales, num_head)
-    else:
+    elif args.model_depth == 'deep':
         return DSNet_DeepAttention(base_model, num_feature, num_hidden, anchor_scales, num_head)
+    elif args.model_depth == 'local-global-attention':
+        return DSNet_MultiAttention(base_model, num_feature, num_hidden, anchor_scales, num_head)
     
 
 

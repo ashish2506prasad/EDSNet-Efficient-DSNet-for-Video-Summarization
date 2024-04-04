@@ -35,9 +35,9 @@ def get_parser() -> argparse.ArgumentParser:
     parser.add_argument('model', type=str,
                         choices=('anchor-based', 'anchor-free'))
     parser.add_argument('--model-depth', type=str, default='shallow',
-                        choices=['shallow', 'deep'])
-    parser.add_argument('--feature-extractor', type=str, default='google net', 
-                        choices=['google net', 'convnext', 'swin transfromer'])
+                        choices=['shallow', 'deep', 'local-global-attention'])
+    # parser.add_argument('--feature-extractor', type=str, default='google net', 
+    #                     choices=['google net', 'convnext', 'swin transfromer'])
 
     # training & evaluation
     parser.add_argument('--device', type=str, default='cuda',
