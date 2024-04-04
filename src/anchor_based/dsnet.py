@@ -138,7 +138,7 @@ class DSNet_DeepAttention(nn.Module):
         return pred_cls, pred_bboxes
 
 class MultiAttention(nn.Module):
-    def __init__(self, num_feature, base_model, num_segments=None, num_head=8):
+    def __init__(self, num_feature, base_model, num_segments=5 , num_head=8):
         super(MultiAttention, self).__init__()
 
         self.num_segments = num_segments
@@ -147,26 +147,34 @@ class MultiAttention(nn.Module):
         self.fc = nn.Sequential(nn.Linear(num_feature, num_feature),
                                 nn.ReLU())
 
-        assert self.num_segments >= 2, "num_segments must be None or 2+"
-        self.local_attention = nn.ModuleList()
-        for _ in range(self.num_segments):
-            # Local Attention, considering differences among the same segment with reduce hidden size
-            self.local_attention.append(build_base_model(base_model, num_feature, num_head = 1))
+        self.num_segments = num_segments
+        if self.num_segments is not None:
+            assert self.num_segments >= 2, "num_segments must be None or 2+"
+            self.local_attention = nn.ModuleList()
+            for _ in range(self.num_segments):
+                # Local Attention, considering differences among the same segment with reduce hidden size
+                self.local_attention.append(build_base_model(base_model, num_feature, num_head=1))
 
     def forward(self, x):
-        """ COmputes multi-attention of different segments and fuses the results
+        """ Computes multi-attention of different segments and fuses the results
         """
-        global_attention = self.layer_norm(self.global_attention(x))
-        if self.num_segments is not None:
-            segment_size = math.ceil(x.shape[0] / self.num_segments)
+        print(x.shape)
+        weighted_value = self.global_attention(x)  # global attention
+
+        if self.num_segments is not None :
+            segment_size = math.ceil(x.shape[1] / self.num_segments)
             for segment in range(self.num_segments):
                 left_pos = segment * segment_size
                 right_pos = (segment + 1) * segment_size
-                local_x = x[left_pos:right_pos]
-                weighted_local_value = self.layer_norm(self.fc(self.local_attention[segment](local_x))) 
-                global_attention[left_pos:right_pos] += weighted_local_value
+                local_x = x[:,left_pos:right_pos]
+                weighted_local_value = self.local_attention[segment](local_x)  # local attentions
 
-        return global_attention
+                # Normalize the features vectors
+                weighted_value[left_pos:right_pos] = F.normalize(weighted_value[left_pos:right_pos].clone(), p=2, dim=1)
+                weighted_local_value = F.normalize(weighted_local_value, p=2, dim=1)
+                weighted_value[left_pos:right_pos] += weighted_local_value
+
+        return weighted_value
         
 
 class DSNet_MultiAttention(nn.Module):
