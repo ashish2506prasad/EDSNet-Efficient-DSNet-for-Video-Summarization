@@ -14,8 +14,6 @@ def get_anchor_based(base_model, num_feature, num_hidden, anchor_scales,
         return DSNet_MultiAttention(base_model, num_feature, num_hidden, anchor_scales, num_head)
     
 
-
-
 def get_anchor_free(base_model, num_feature, num_hidden, num_head, **kwargs):
     args = init_helper.get_arguments()
     if args.model_depth == 'shallow':

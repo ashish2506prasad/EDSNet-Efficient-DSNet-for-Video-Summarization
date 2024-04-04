@@ -177,7 +177,7 @@ class DSNet_MultiAttention(nn.Module):
         self.anchor_scales = anchor_scales
         self.num_scales = len(anchor_scales)
         self.base_model1 = build_base_model(base_model, num_feature, num_head)
-        self.multiattentionblock = MultiAttention(num_feature, base_model, num_segments=5, num_head=num_head)
+        self.multiattentionblock = MultiAttention(num_feature, base_model, num_segments=5, num_head=1)
 
         self.roi_poolings = [nn.AvgPool1d(scale, stride=1, padding=scale // 2)
                              for scale in anchor_scales]
