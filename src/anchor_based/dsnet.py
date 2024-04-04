@@ -158,21 +158,25 @@ class MultiAttention(nn.Module):
     def forward(self, x):
         """ Computes multi-attention of different segments and fuses the results
         """
-        print(x.shape)
+        # print(x.shape)
         weighted_value = self.global_attention(x)  # global attention
+        # print(weighted_value.shape)
 
         if self.num_segments is not None :
             segment_size = math.ceil(x.shape[1] / self.num_segments)
+            # print(segment_size)
             for segment in range(self.num_segments):
                 left_pos = segment * segment_size
                 right_pos = (segment + 1) * segment_size
                 local_x = x[:,left_pos:right_pos]
                 weighted_local_value = self.local_attention[segment](local_x)  # local attentions
+                # print(weighted_local_value.shape)
 
                 # Normalize the features vectors
                 weighted_value[left_pos:right_pos] = F.normalize(weighted_value[left_pos:right_pos].clone(), p=2, dim=1)
                 weighted_local_value = F.normalize(weighted_local_value, p=2, dim=1)
-                weighted_value[left_pos:right_pos] += weighted_local_value
+                # print(weighted_value[left_pos:right_pos].shape)
+                weighted_value[:,left_pos:right_pos] += weighted_local_value
 
         return weighted_value
         
