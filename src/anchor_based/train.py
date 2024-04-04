@@ -5,10 +5,11 @@ import torch
 from torch import nn
 
 from anchor_based import anchor_helper
-from anchor_based.dsnet import DSNet, DSNet_DeepAttention
+from anchor_based.dsnet import DSNet, DSNet_DeepAttention, DSNet_MultiAttention
 from anchor_based.losses import calc_cls_loss, calc_loc_loss
 from evaluate import evaluate
 from helpers import data_helper, vsumm_helper, bbox_helper
+import matplotlib.pyplot as plt
 
 logger = logging.getLogger()
 
@@ -19,15 +20,19 @@ def xavier_init(module):
         nn.init.xavier_uniform_(module.weight, gain=np.sqrt(2.0))
         if module.bias is not None:
             nn.init.constant_(module.bias, 0.1)
-
+  
 
 def train(args, split, save_path):
     if args.model_depth == 'shallow':
         model = DSNet(base_model=args.base_model, num_feature=args.num_feature,
                     num_hidden=args.num_hidden, anchor_scales=args.anchor_scales,
                     num_head=args.num_head)
-    else:
+    elif args.model_depth == 'deep':
         model = DSNet_DeepAttention(base_model=args.base_model, num_feature=args.num_feature,
+                    num_hidden=args.num_hidden, anchor_scales=args.anchor_scales,
+                    num_head=args.num_head)
+    elif args.model_depth == 'local-global-attention':
+        model = DSNet_MultiAttention(base_model=args.base_model, num_feature=args.num_feature,
                     num_hidden=args.num_hidden, anchor_scales=args.anchor_scales,
                     num_head=args.num_head)
     
@@ -46,6 +51,9 @@ def train(args, split, save_path):
 
     val_set = data_helper.VideoDataset(split['test_keys'])
     val_loader = data_helper.DataLoader(val_set, shuffle=False)
+
+    epoch_list = []
+    f1_score = []
 
     for epoch in range(args.max_epoch):
         model.train()
@@ -104,6 +112,8 @@ def train(args, split, save_path):
                          loc_loss=loc_loss.item())
 
         val_fscore, _ = evaluate(model, val_loader, args.nms_thresh, args.device)
+        f1_score.append(val_fscore)
+        epoch_list.append(epoch)
 
         if max_val_fscore < val_fscore:
             max_val_fscore = val_fscore
@@ -118,4 +128,4 @@ def train(args, split, save_path):
                         f'Loss: {stats.cls_loss:.4f}/{stats.loc_loss:.4f}/{stats.loss:.4f} '
                         f'F-score cur/max: {val_fscore:.4f}/{max_val_fscore:.4f}')
 
-    return max_val_fscore
+    return max_val_fscore, f1_score, epoch_list

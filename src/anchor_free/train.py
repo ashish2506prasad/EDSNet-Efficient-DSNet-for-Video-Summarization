@@ -35,6 +35,9 @@ def train(args, split, save_path):
     val_set = data_helper.VideoDataset(split['test_keys'])
     val_loader = data_helper.DataLoader(val_set, shuffle=False)
 
+    epoch_list = []
+    f1_score = []
+
     for epoch in range(args.max_epoch):
         model.train()
         stats = data_helper.AverageMeter('loss', 'cls_loss', 'loc_loss',
@@ -76,6 +79,9 @@ def train(args, split, save_path):
 
         val_fscore, _ = evaluate(model, val_loader, args.nms_thresh, args.device)
 
+        f1_score.append(val_fscore)
+        epoch_list.append(epoch)
+
         if max_val_fscore < val_fscore:
             max_val_fscore = val_fscore
             torch.save(model.state_dict(), str(save_path))
@@ -90,4 +96,4 @@ def train(args, split, save_path):
                         f'F-score cur/max: {val_fscore:.4f}/{max_val_fscore:.4f}')
 
 
-    return max_val_fscore
+    return max_val_fscore, f1_score, epoch_list

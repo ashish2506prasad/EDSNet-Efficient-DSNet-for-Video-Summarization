@@ -4,6 +4,7 @@ from pathlib import Path
 from anchor_based.train import train as train_anchor_based
 from anchor_free.train import train as train_anchor_free
 from helpers import init_helper, data_helper
+import matplotlib.pyplot as plt
 
 logger = logging.getLogger()
 
@@ -41,10 +42,11 @@ def main():
         results = {}
         stats = data_helper.AverageMeter('fscore')
 
+
         for split_idx, split in enumerate(splits):
             logger.info(f'Start training on {split_path.stem}: split {split_idx}')
             ckpt_path = data_helper.get_ckpt_path(model_dir, split_path, split_idx)
-            fscore = trainer(args, split, ckpt_path)
+            fscore, f1_score, epoch_list = trainer(args, split, ckpt_path)
             stats.update(fscore=fscore)
             results[f'split{split_idx}'] = float(fscore)
 
