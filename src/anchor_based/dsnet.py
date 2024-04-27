@@ -10,7 +10,7 @@ import math
 
 class DSNet(nn.Module):
     def __init__(self, base_model, num_feature, num_hidden, anchor_scales,
-                 num_head):
+                 num_head, fc_depth):
         super().__init__()
         self.anchor_scales = anchor_scales
         self.num_scales = len(anchor_scales)
@@ -20,20 +20,14 @@ class DSNet(nn.Module):
                              for scale in anchor_scales]
 
         self.layer_norm = nn.LayerNorm(num_feature)
-        self.fc1 = nn.Sequential(
-            nn.Linear(num_feature, num_hidden),
-            nn.Tanh(),
-            nn.Dropout(0.5),
-            nn.LayerNorm(num_hidden),
-            nn.Linear(num_hidden, 2*num_hidden),
-            nn.Tanh(),
-            nn.Dropout(0.5),
-            nn.LayerNorm(2*num_hidden),
-            nn.Linear(2*num_hidden, num_hidden),
-            nn.Tanh(),
+        self.fc1 = nn.Linear(num_feature, num_hidden)
+        self.fc_block = nn.Sequential(nn.Linear(num_hidden, num_hidden),
+            nn.ReLU(),
             nn.Dropout(0.5),
             nn.LayerNorm(num_hidden)
-        )
+            )
+        self.fc = nn.ModuleList([self.fc_block for i in range(fc_depth)])
+        
         self.fc_cls = nn.Linear(num_hidden, 1)
         self.fc_loc = nn.Linear(num_hidden, 2)
 
@@ -41,13 +35,13 @@ class DSNet(nn.Module):
         _, seq_len, _ = x.shape
         out = self.base_model(x)
         out = out + x
-        out = self.layer_norm(out)
+        out = self.fc1(self.layer_norm(out))
+        for fc in self.fc:
+            out = fc(out)
 
         out = out.transpose(2, 1)
         pool_results = [roi_pooling(out) for roi_pooling in self.roi_poolings]
         out = torch.cat(pool_results, dim=0).permute(2, 0, 1)[:-1]
-
-        out = self.fc1(out)
 
         pred_cls = self.fc_cls(out).sigmoid().view(seq_len, self.num_scales)
         pred_loc = self.fc_loc(out).view(seq_len, self.num_scales, 2)
@@ -72,7 +66,7 @@ class DSNet(nn.Module):
 
 class DSNet_DeepAttention(nn.Module):
     def __init__(self, base_model, num_feature, num_hidden, anchor_scales,
-                 num_head):
+                 num_head, fc_depth):
         super().__init__()
         self.anchor_scales = anchor_scales
         self.num_scales = len(anchor_scales)
@@ -83,24 +77,13 @@ class DSNet_DeepAttention(nn.Module):
                              for scale in anchor_scales]
 
         self.layer_norm = nn.LayerNorm(num_feature)
-        self.fc1 = nn.Sequential(
-            nn.Linear(num_feature, num_hidden),
-            nn.Tanh(),
+        self.fc1 = nn.Linear(num_feature, num_hidden)
+        self.fc_block = nn.Sequential(nn.Linear(num_hidden, num_hidden),
+            nn.ReLU(),
             nn.Dropout(0.5),
-            nn.LayerNorm(num_hidden),
-            nn.Linear(num_hidden, 2*num_hidden),
-            nn.Tanh(),
-            nn.Dropout(0.5),
-            nn.LayerNorm(2*num_hidden),
-            nn.Linear(2*num_hidden, num_hidden),
-            nn.Tanh(),
-            nn.Dropout(0.5),
-            nn.LayerNorm(num_hidden),
-            nn.Linear(num_hidden, num_hidden),
-            nn.Tanh(),
-            nn.Dropout(0.5),
-            nn.LayerNorm(num_hidden)
-        )
+            nn.LayerNorm(num_hidden))
+        self.fc = nn.ModuleList([self.fc_block for i in range(fc_depth)])
+
         self.fc_cls = nn.Linear(num_hidden, 1)
         self.fc_loc = nn.Linear(num_hidden, 2)
 
@@ -110,12 +93,14 @@ class DSNet_DeepAttention(nn.Module):
         out = self.base_model2(out1)
         out = x + out1 + out
         out = self.layer_norm(out)
+        out = self.fc1(out)
+        for fc in self.fc:
+            out = fc(out)
+
 
         out = out.transpose(2, 1)
         pool_results = [roi_pooling(out) for roi_pooling in self.roi_poolings]
         out = torch.cat(pool_results, dim=0).permute(2, 0, 1)[:-1]
-
-        out = self.fc1(out)
 
         pred_cls = self.fc_cls(out).sigmoid().view(seq_len, self.num_scales)
         pred_loc = self.fc_loc(out).view(seq_len, self.num_scales, 2)
@@ -138,7 +123,7 @@ class DSNet_DeepAttention(nn.Module):
         return pred_cls, pred_bboxes
 
 class MultiAttention(nn.Module):
-    def __init__(self, num_feature, base_model, num_segments=5 , num_head=8):
+    def __init__(self, num_feature, base_model, num_segments=5 , num_head=8, local_attention_head=1):
         super(MultiAttention, self).__init__()
 
         self.num_segments = num_segments
@@ -153,13 +138,13 @@ class MultiAttention(nn.Module):
             self.local_attention = nn.ModuleList()
             for _ in range(self.num_segments):
                 # Local Attention, considering differences among the same segment with reduce hidden size
-                self.local_attention.append(build_base_model(base_model, num_feature, num_head=1))
+                self.local_attention.append(build_base_model(base_model, num_feature, num_head=local_attention_head))
 
     def forward(self, x):
         """ Computes multi-attention of different segments and fuses the results
         """
         # print(x.shape)
-        weighted_value = self.global_attention(x)  # global attention
+        weighted_value = self.fc(self.global_attention(x))  # global attention
         # print(weighted_value.shape)
 
         if self.num_segments is not None :
@@ -169,7 +154,7 @@ class MultiAttention(nn.Module):
                 left_pos = segment * segment_size
                 right_pos = (segment + 1) * segment_size
                 local_x = x[:,left_pos:right_pos]
-                weighted_local_value = self.local_attention[segment](local_x)  # local attentions
+                weighted_local_value = self.fc(self.local_attention[segment](local_x))  # local attentions
                 # print(weighted_local_value.shape)
 
                 # Normalize the features vectors
@@ -188,7 +173,7 @@ class DSNet_MultiAttention(nn.Module):
         self.anchor_scales = anchor_scales
         self.num_scales = len(anchor_scales)
         # self.base_model1 = build_base_model(base_model, num_feature, num_head)
-        self.multiattentionblock = MultiAttention(num_feature, base_model, num_segments=5, num_head=num_head)
+        self.multiattentionblock = MultiAttention(num_feature, base_model, num_segments=4, num_head=num_head, local_attention_head = 2)
 
         self.roi_poolings = [nn.AvgPool1d(scale, stride=1, padding=scale // 2)
                              for scale in anchor_scales]

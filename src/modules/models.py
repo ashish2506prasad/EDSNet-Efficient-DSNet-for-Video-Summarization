@@ -127,7 +127,7 @@ def build_base_model(base_type: str,
     elif base_type == 'attention':
         base_model = AttentionExtractor(num_head, num_feature)
     elif base_type == 'nystromformer':
-        base_model = NystromAttention(dim=num_feature, dim_head = 64, heads = num_head, num_landmarks = 32, pinv_iterations = 6,residual = True,residual_conv_kernel = 33)
+        base_model = NystromAttention(dim=num_feature, dim_head = 64, heads = num_head, num_landmarks = 64, pinv_iterations = 6,residual = True,residual_conv_kernel = 33)
     else:
         raise ValueError(f'Invalid base model {base_type}')
 

@@ -51,6 +51,7 @@ def get_parser() -> argparse.ArgumentParser:
     parser.add_argument('--weight-decay', type=float, default=1e-5)
     parser.add_argument('--lambda-reg', type=float, default=1.0)
     parser.add_argument('--nms-thresh', type=float, default=0.5)
+    parser.add_argument('--fc-depth', type=int, default=1)
 
     # inference
     parser.add_argument('--ckpt-path', type=str, default=None)
