@@ -41,7 +41,7 @@ def get_parser() -> argparse.ArgumentParser:
 
     # training & evaluation
     parser.add_argument('--device', type=str, default='cuda',
-                        choices=('cuda', 'cpu'))
+                        choices=('cuda', 'cpu', 'cuda:0', 'cuda:1'))
     parser.add_argument('--seed', type=int, default=12345)
     parser.add_argument('--splits', type=str, nargs='+', default=[])
     parser.add_argument('--max-epoch', type=int, default=300)
