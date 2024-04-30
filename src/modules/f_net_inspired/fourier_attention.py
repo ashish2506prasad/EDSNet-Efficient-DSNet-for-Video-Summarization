@@ -67,5 +67,3 @@ class BuildModel(nn.Module):
         for layer in self.fft_layer_list:
             x = layer(x)
         return self.dense(x)
-    
-

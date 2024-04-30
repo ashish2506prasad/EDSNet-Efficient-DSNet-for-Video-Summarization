@@ -3,7 +3,7 @@ import math
 import torch
 from torch import nn
 from transformer.nystroformer import NystromAttention
-from f_net_inspired.fourier_attention import BuildModel 
+from modules.f_net_inspired.fourier_attention import BuildModel 
 
 class ScaledDotProductAttention(nn.Module):
     def __init__(self, d_k):
