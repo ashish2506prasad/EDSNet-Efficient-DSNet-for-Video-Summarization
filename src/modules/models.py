@@ -3,7 +3,7 @@ import math
 import torch
 from torch import nn
 from transformer.nystroformer import NystromAttention
-
+from f_net_inspired.fourier_attention import BuildModel 
 
 class ScaledDotProductAttention(nn.Module):
     def __init__(self, d_k):
@@ -128,6 +128,8 @@ def build_base_model(base_type: str,
         base_model = AttentionExtractor(num_head, num_feature)
     elif base_type == 'nystromformer':
         base_model = NystromAttention(dim=num_feature, dim_head = 64, heads = num_head, num_landmarks = 64, pinv_iterations = 6,residual = True,residual_conv_kernel = 33)
+    elif base_type == 'fourier':
+        base_model = BuildModel(num_feature, dropout=0.5, ffttype='paper', pos_encoding=None, num_layers=2)
     else:
         raise ValueError(f'Invalid base model {base_type}')
 

@@ -1,6 +1,7 @@
 from anchor_based.dsnet import DSNet, DSNet_DeepAttention, DSNet_MultiAttention
 from anchor_free.dsnet_af import DSNetAF, DSNetAF_DeepAttention
 from helpers import init_helper
+from anchor_based.fourier_ab_models import DSNet_fourier
 
 
 def get_anchor_based( base_model, num_feature, num_hidden, anchor_scales,

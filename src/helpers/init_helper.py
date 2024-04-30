@@ -51,7 +51,7 @@ def get_parser() -> argparse.ArgumentParser:
     parser.add_argument('--weight-decay', type=float, default=1e-5)
     parser.add_argument('--lambda-reg', type=float, default=1.0)
     parser.add_argument('--nms-thresh', type=float, default=0.5)
-    parser.add_argument('--fc-depth', type=int, default=1)
+    parser.add_argument('--fc-depth', type=int, default=5)
 
     # inference
     parser.add_argument('--ckpt-path', type=str, default=None)
@@ -62,7 +62,7 @@ def get_parser() -> argparse.ArgumentParser:
     # common model config
     parser.add_argument('--base-model', type=str, default='attention',
                         choices=['attention', 'lstm', 'linear', 'bilstm',
-                                 'gcn', 'nystromformer'])
+                                 'gcn', 'nystromformer', 'fourier'])
     parser.add_argument('--num-head', type=int, default=8)
     parser.add_argument('--num-feature', type=int, default=1024)
     parser.add_argument('--num-hidden', type=int, default=128)
