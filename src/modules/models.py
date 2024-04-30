@@ -113,7 +113,7 @@ class LSTMExtractor(nn.LSTM):
 
 def build_base_model(base_type: str,
                      num_feature: int,
-                     num_head: int
+                     num_head: int, 
                      ) -> nn.Module:
     if base_type == 'linear':
         base_model = nn.Linear(num_feature, num_feature)
@@ -129,7 +129,7 @@ def build_base_model(base_type: str,
     elif base_type == 'nystromformer':
         base_model = NystromAttention(dim=num_feature, dim_head = 64, heads = num_head, num_landmarks = 64, pinv_iterations = 6,residual = True,residual_conv_kernel = 33)
     elif base_type == 'fourier':
-        base_model = BuildModel(num_feature, dropout=0.5, ffttype='paper', pos_encoding=None, num_layers=2)
+        base_model = BuildModel(num_feature, dropout=0.5, ffttype='paper', pos_encoding=None, num_layers=1)
     else:
         raise ValueError(f'Invalid base model {base_type}')
 
