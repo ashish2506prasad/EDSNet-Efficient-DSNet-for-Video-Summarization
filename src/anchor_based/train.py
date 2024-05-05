@@ -5,11 +5,13 @@ import torch
 from torch import nn
 
 from anchor_based import anchor_helper
-from anchor_based.dsnet import DSNet, DSNet_DeepAttention, DSNet_MultiAttention
+from anchor_based.dsnet import DSNet, DSNet_DeepAttention, DSNet_MultiAttention, DSNetTriangularAttention
 from anchor_based.losses import calc_cls_loss, calc_loc_loss
 from evaluate import evaluate
 from helpers import data_helper, vsumm_helper, bbox_helper
 import matplotlib.pyplot as plt
+
+import time as time
 
 logger = logging.getLogger()
 
@@ -23,6 +25,7 @@ def xavier_init(module):
   
 
 def train(args, split, save_path):
+
     if args.model_depth == 'shallow':
         model = DSNet(base_model=args.base_model, num_feature=args.num_feature,
                     num_hidden=args.num_hidden, anchor_scales=args.anchor_scales,
@@ -35,7 +38,10 @@ def train(args, split, save_path):
         model = DSNet_MultiAttention(base_model=args.base_model, num_feature=args.num_feature,
                     num_hidden=args.num_hidden, anchor_scales=args.anchor_scales,
                     num_head=args.num_head)
-    
+    elif args.model_depth == 'triangular':
+        model = DSNetTriangularAttention(base_model=args.base_model, num_feature=args.num_feature,
+                    num_hidden=args.num_hidden, anchor_scales=args.anchor_scales,
+                    num_head=args.num_head)
     model = model.to(args.device)
 
     model.apply(xavier_init)
@@ -56,6 +62,7 @@ def train(args, split, save_path):
     f1_score = []
 
     for epoch in range(args.max_epoch):
+        start = time.time()
         model.train()
         stats = data_helper.AverageMeter('loss', 'cls_loss', 'loc_loss')
 
@@ -108,8 +115,10 @@ def train(args, split, save_path):
             loss.backward()
             optimizer.step()
 
+
             stats.update(loss=loss.item(), cls_loss=cls_loss.item(),
                          loc_loss=loc_loss.item())
+        end = time.time()
 
         val_fscore, _ = evaluate(model, val_loader, args.nms_thresh, args.device)
         f1_score.append(val_fscore)
@@ -119,14 +128,18 @@ def train(args, split, save_path):
             max_val_fscore = val_fscore
             torch.save(model.state_dict(), str(save_path))
 
+        end = time.time()
+
         if epoch % 10 == 0:
             if args.where == 'local':
                 logger.info(f'Epoch: {epoch}/{args.max_epoch} '
                             f'Loss: {stats.cls_loss:.4f}/{stats.loc_loss:.4f}/{stats.loss:.4f} '
-                            f'F-score cur/max: {val_fscore:.4f}/{max_val_fscore:.4f}')
+                            f'F-score cur/max: {val_fscore:.4f}/{max_val_fscore:.4f}'
+                            f'Time: {end-start:.4f}')
             else:
                 print(f'Epoch: {epoch}/{args.max_epoch} '
                             f'Loss: {stats.cls_loss:.4f}/{stats.loc_loss:.4f}/{stats.loss:.4f} '
-                            f'F-score cur/max: {val_fscore:.4f}/{max_val_fscore:.4f}')
+                            f'F-score cur/max: {val_fscore:.4f}/{max_val_fscore:.4f}'
+                            f'Time: {end-start:.4f}')
 
     return max_val_fscore, f1_score, epoch_list
