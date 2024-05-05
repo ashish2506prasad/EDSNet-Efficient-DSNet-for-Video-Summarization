@@ -160,15 +160,15 @@ class DSNetTriangularAttention(nn.Module):
 
     def forward(self, x):
         _, seq_len, _ = x.shape
-        print(x.shape)
+        # print(x.shape)
         out = self.fc1(self.layer_norm1(self.base_model1(x) + x))
-        print(out.shape)
+        # print(out.shape)
         out = self.fc2(self.layer_norm2(self.base_model2(out) + out))
-        print(out.shape)
+        # print(out.shape)
         out = self.fc3(self.layer_norm3(self.base_model3(out) + out))
-        print(out.shape)
+        # print(out.shape)
         out = self.fc4(self.layer_norm4(self.base_model4(out) + out)) 
-        print(out.shape)
+        # print(out.shape)
 
         out = out.transpose(2, 1)
         pool_results = [roi_pooling(out) for roi_pooling in self.roi_poolings]
