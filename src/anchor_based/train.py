@@ -33,7 +33,7 @@ def train(args, split, save_path):
     elif args.model_depth == 'deep':
         model = DSNet_DeepAttention(base_model=args.base_model, num_feature=args.num_feature,
                     num_hidden=args.num_hidden, anchor_scales=args.anchor_scales,
-                    num_head=args.num_head, fc_depth=args.fc_depth)
+                    num_head=args.num_head, fc_depth=args.fc_depth, attention_depth=args.attention_depth)
     elif args.model_depth == 'local-global-attention':
         model = DSNet_MultiAttention(base_model=args.base_model, num_feature=args.num_feature,
                     num_hidden=args.num_hidden, anchor_scales=args.anchor_scales,

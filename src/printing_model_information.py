@@ -37,7 +37,7 @@ def model_summary(model):
             print("printing model summary (deep attention): ")
             summary(DSNet_DeepAttention(base_model=args.base_model, num_feature=args.num_feature,
                     num_hidden=args.num_hidden, anchor_scales=args.anchor_scales,
-                    num_head=args.num_head, fc_depth=args.fc_depth))
+                    num_head=args.num_head, fc_depth=args.fc_depth, attention_depth=args.attention_depth))
         elif args.model_depth == 'local-global-attention':
             print("printing model summary (local-global-attention): ")
             summary(DSNet_MultiAttention(base_model=args.base_model, num_feature=args.num_feature,
