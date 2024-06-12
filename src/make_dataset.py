@@ -15,6 +15,8 @@ def main():
     parser.add_argument('--label-dir', type=str, default='../custom_data/labels/')
     parser.add_argument('--sample-rate', type=int, default=15)
     parser.add_argument('--save-path', type=str, default='../custom_data/custom_dataset.h5')
+    parser.add_argument('--feature-extractor', type=str, default='google-net',
+                        choices=['google-net', 'swin-transformer', 'convnext'])
     args = parser.parse_args()
 
     # create output directory
@@ -26,7 +28,7 @@ def main():
 
     # feature extractor
     print('Loading feature extractor ...')
-    video_proc = video_helper.VideoPreprocessor(args.sample_rate)
+    video_proc = video_helper.VideoPreprocessor(args.sample_rate, args.feature_extractor)
 
     # search all videos with .mp4 suffix
     video_paths = sorted(Path(args.video_dir).glob('*.mp4'))
@@ -43,6 +45,8 @@ def main():
                 data = json.load(f)
             user_summary = np.array(data['user_summary'], dtype=np.float32)
             _, label_n_frames = user_summary.shape
+            # print video name and number of frames
+            print(f'processing {video_name}: {n_frames} frames')
             assert label_n_frames == n_frames, f'Invalid label of size {len(gtscore)}: expected {n_frames}'
 
             # compute ground truth frame scores

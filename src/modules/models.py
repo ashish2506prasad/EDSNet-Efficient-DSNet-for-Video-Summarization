@@ -4,6 +4,7 @@ import torch
 from torch import nn
 from transformer.nystroformer import NystromAttention
 from modules.f_net_inspired.fourier_attention import FNet_layer, FastFNetLayer 
+# from mamba_ssm import Mamba
 
 class ScaledDotProductAttention(nn.Module):
     def __init__(self, d_k):
@@ -132,6 +133,8 @@ def build_base_model(base_type: str,
         base_model = FNet_layer(num_feature, dropout=0.5)
     elif base_type == 'fast-fourier':
         base_model = FastFNetLayer(num_feature, dropout = 0.5)
+    # elif base_type =='mamba':
+    #     base_model = Mamba()
     else:
         raise ValueError(f'Invalid base model {base_type}')
 

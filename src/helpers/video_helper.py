@@ -1,4 +1,9 @@
 from os import PathLike
+
+import os
+os.environ["KMP_DUPLICATE_LIB_OK"] = "TRUE"
+os.environ["OMP_NUM_THREADS"] = "1"
+
 from pathlib import Path
 import logging
 import cv2
@@ -8,39 +13,43 @@ from PIL import Image
 from numpy import linalg
 from torch import nn
 from torchvision import transforms, models
-import init_helper
+# import init_helper
 
 from kts.cpd_auto import cpd_auto
 import os
 
 logger = logging.getLogger()
 
+def ends_with_mp4(path: PathLike) -> bool:
+    return str(path).endswith('.mp4')
+
 
 class FeatureExtractor(object):
-    def __init__(args, self):
+    def __init__(self, feature_extractor):
         self.preprocess = transforms.Compose([
             transforms.Resize(256),
             transforms.CenterCrop(224),
             transforms.ToTensor(),
             transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
         ])
-        model_google_net = models.googlenet(pretrained=True)
-        model_google_net = nn.Sequential(*list(model_google_net.children())[:-2])
-        model_google_net = model_google_net.cuda().eval()
+        
 
-        model_convnext = models.convnext_large(pretrained=True)
-        model_convnext = nn.Sequential(*list(model_convnext.children())[:-1])
-        model_convnext = model_convnext.cuda().eval()
-
-        model_swin_b = models.swin_v2_b(pretrained=True)
-        model_swin_b = nn.Sequential(*list(model_swin_b.children())[:-1])
-        model_swin_b = model_swin_b.cuda().eval()
-
-        if args.feature_extractor == 'google-net':
+        if feature_extractor == 'google-net':
+            model_google_net = models.googlenet(pretrained=True)
+            model_google_net = nn.Sequential(*list(model_google_net.children())[:-2])
+            model_google_net = model_google_net.cuda().eval()
             self.model = model_google_net
-        elif args.feature_extractor =='swin-transformer':
+
+        elif feature_extractor =='swin-transformer':
+            model_swin_b = models.swin_v2_b(pretrained=True)
+            model_swin_b = nn.Sequential(*list(model_swin_b.children())[:-1])
+            model_swin_b = model_swin_b.cuda().eval()
             self.model = model_swin_b
-        elif args.feature_extractor == 'convnext':
+
+        elif feature_extractor == 'convnext':
+            model_convnext = models.convnext_large(pretrained=True)
+            model_convnext = nn.Sequential(*list(model_convnext.children())[:-1])
+            model_convnext = model_convnext.cuda().eval()
             self.model = model_convnext
 
 
@@ -50,7 +59,7 @@ class FeatureExtractor(object):
         batch = img.unsqueeze(0)
         with torch.no_grad():
             feat = self.model(batch.cuda())
-            feat = feat.view(-1,1).cpu().numpy()
+            feat = feat.view(-1).cpu().numpy()
 
         assert feat.shape == (1024,), f'Invalid feature shape {feat.shape}: expected 1024'
         # normalize frame features
@@ -59,8 +68,8 @@ class FeatureExtractor(object):
 
 
 class VideoPreprocessor(object):
-    def __init__(self, sample_rate: int) -> None:
-        self.model = FeatureExtractor()
+    def __init__(self, sample_rate: int, feature_extractor) -> None:
+        self.model = FeatureExtractor(feature_extractor=feature_extractor)
         self.sample_rate = sample_rate
 
     def get_features(self, video_path: PathLike):
@@ -96,6 +105,9 @@ class VideoPreprocessor(object):
         picks = np.arange(0, seq_len) * self.sample_rate
 
         # compute change points using KTS
+        print()
+        print(features.shape)
+        # features = features.reshape((seq_len, 1024))
         kernel = np.matmul(features, features.T)
         change_points, _ = cpd_auto(kernel, seq_len - 1, 1, verbose=False)
         change_points *= self.sample_rate

@@ -7,7 +7,6 @@ from modules.models import build_base_model
 import torch.nn.functional as F
 import math
 
-
 class DSNet(nn.Module):
     def __init__(self, base_model, num_feature, num_hidden, anchor_scales,
                  num_head, fc_depth):
@@ -196,7 +195,7 @@ class DSNetTriangularAttention(nn.Module):
 
 
 class MultiAttention(nn.Module):
-    def __init__(self, num_feature, base_model, num_segments=5 , num_head=8, local_attention_head=4):
+    def __init__(self, num_feature, base_model, num_segments=5, num_head=8, local_attention_head=4):
         super(MultiAttention, self).__init__()
 
         self.num_segments = num_segments
@@ -205,38 +204,35 @@ class MultiAttention(nn.Module):
         self.fc = nn.Sequential(nn.Linear(num_feature, num_feature),
                                 nn.ReLU())
 
-        self.num_segments = num_segments
         if self.num_segments is not None:
             assert self.num_segments >= 2, "num_segments must be None or 2+"
             self.local_attention = nn.ModuleList()
             for _ in range(self.num_segments):
-                # Local Attention, considering differences among the same segment with reduce hidden size
                 self.local_attention.append(build_base_model(base_model, num_feature, num_head=local_attention_head))
 
     def forward(self, x):
-        """ Computes multi-attention of different segments and fuses the results
-        """
-        # print(x.shape)
-        weighted_value = self.fc(self.global_attention(x))  # global attention
-        # print(weighted_value.shape)
+        weighted_value = self.fc(self.global_attention(x))
 
-        if self.num_segments is not None :
+        if self.num_segments is not None:
             segment_size = math.ceil(x.shape[-2] / self.num_segments)
-            # print(segment_size)
             for segment in range(self.num_segments):
                 left_pos = segment * segment_size
                 right_pos = (segment + 1) * segment_size
-                local_x = x[:,left_pos:right_pos,:]
-                weighted_local_value = self.fc(self.local_attention[segment](local_x))  # local attentions
-                # print(weighted_local_value.shape)
+                local_x = x[:, left_pos:right_pos, :]
+                weighted_local_value = self.fc(self.local_attention[segment](local_x))
 
-                # Normalize the features vectors
-                weighted_value[left_pos:right_pos] = F.normalize(weighted_value[left_pos:right_pos].clone(), p=2, dim=1)
-                weighted_local_value = F.normalize(weighted_local_value, p=2, dim=1)
-                # print(weighted_value[left_pos:right_pos].shape)
-                weighted_value[:,left_pos:right_pos] += weighted_local_value
+                normalized_global_value = F.normalize(weighted_value[:, left_pos:right_pos, :], p=2, dim=-1)
+                normalized_local_value = F.normalize(weighted_local_value, p=2, dim=-1)
+
+                # Avoid in-place operation
+                weighted_value = torch.cat((
+                    weighted_value[:, :left_pos, :],
+                    normalized_global_value + normalized_local_value,
+                    weighted_value[:, right_pos:, :]
+                ), dim=1)
 
         return weighted_value
+
         
 
 class DSNet_MultiAttention(nn.Module):
@@ -257,11 +253,6 @@ class DSNet_MultiAttention(nn.Module):
             nn.Tanh(),
             nn.Dropout(0.5),
             nn.LayerNorm(num_hidden),
-            nn.Linear(num_hidden, num_hidden),
-            nn.ReLU(),
-            nn.Dropout(0.5),
-            nn.LayerNorm(num_hidden),
-            nn.Linear(num_hidden, num_hidden),
             nn.ReLU(),
             nn.Dropout(0.5),
             nn.LayerNorm(num_hidden)
