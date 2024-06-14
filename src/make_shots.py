@@ -18,6 +18,7 @@ def main():
         features = video_file['features'][...].astype(np.float32)
         gtscore = video_file['gtscore'][...].astype(np.float32)
         gtsummary = video_file['gtsummary'][...].astype(np.float32)
+        # motion_features = video_file['motion_features'][...].astype(np.float32)
 
         seq_len = gtscore.size
         n_frames = seq_len * 15 - 1
@@ -44,6 +45,7 @@ def main():
         h5out.create_dataset(video_name + '/picks', data=picks)
         # h5out.create_dataset(video_name + '/n_steps', data=data_of_name)
         h5out.create_dataset(video_name + '/gtsummary', data=gtsummary)
+        # h5out.create_dataset(video_name + '/motion_features', data=motion_features)
         # h5out.create_dataset(name + '/video_name', data=data_of_name)
 
     h5in.close()
