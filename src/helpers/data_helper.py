@@ -50,7 +50,7 @@ class VideoDataset(object):
     def get_datasets(keys: List[str], where) -> Dict[str, h5py.File]:
         if where == 'kaggle':
             dataset_paths = {str(Path(key).parent) for key in keys}
-            datasets = {path: h5py.File(os.path.join('/kaggle/input/vid-features','/'.join(path.split('/')[2:]) ), 'r') for path in dataset_paths}
+            datasets = {path: h5py.File(os.path.join('/kaggle/input/flow-vid-features','/'.join(path.split('/')[2:]) ), 'r') for path in dataset_paths}
             return datasets
         elif where == 'local':
             dataset_paths = {str(Path(key).parent) for key in keys}
