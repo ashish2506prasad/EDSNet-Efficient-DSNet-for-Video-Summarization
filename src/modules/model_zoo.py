@@ -1,5 +1,7 @@
+
+
 from anchor_based.dsnet import DSNet, DSNet_DeepAttention, DSNet_MultiAttention
-from anchor_based.dsnet import DSNetTriangularAttention
+from anchor_based.dsnet import DSNetTriangularAttention, DSNetMotionFeatures
 from anchor_free.dsnet_af import DSNetAF, DSNetAF_DeepAttention
 from helpers import init_helper
 from anchor_based.fourier_ab_models import DSNet_fourier
@@ -16,6 +18,8 @@ def get_anchor_based( base_model, num_feature, num_hidden, anchor_scales,
         return DSNet_MultiAttention(base_model, num_feature, num_hidden, anchor_scales, num_head)
     elif args.model_depth == 'triangular':
         return DSNetTriangularAttention(base_model, num_feature, num_hidden, anchor_scales, num_head)
+    elif args.model_depth == 'cross-attention':
+        return DSNetMotionFeatures(base_model, num_feature, num_hidden, anchor_scales, num_head)
     
 
 def get_anchor_free(base_model, num_feature, num_hidden, num_head, **kwargs):

@@ -5,7 +5,7 @@ import torch
 from torch import nn
 
 from anchor_based import anchor_helper
-from anchor_based.dsnet import DSNet, DSNet_DeepAttention, DSNet_MultiAttention, DSNetTriangularAttention
+from anchor_based.dsnet import DSNet, DSNet_DeepAttention, DSNet_MultiAttention, DSNetTriangularAttention, DSNetMotionFeatures
 from anchor_based.losses import calc_cls_loss, calc_loc_loss
 from evaluate import evaluate
 from helpers import data_helper, vsumm_helper, bbox_helper
@@ -42,6 +42,10 @@ def train(args, split, save_path):
         model = DSNetTriangularAttention(base_model=args.base_model, num_feature=args.num_feature,
                     num_hidden=args.num_hidden, anchor_scales=args.anchor_scales,
                     num_head=args.num_head)
+    elif args.model_depth == 'cross-attention':
+        model = DSNetMotionFeatures(base_model=args.base_model, num_feature=args.num_feature,
+                    num_hidden=args.num_hidden, anchor_scales=args.anchor_scales,
+                    num_head=args.num_head)
     model = model.to(args.device)
 
     model.apply(xavier_init)
@@ -66,7 +70,7 @@ def train(args, split, save_path):
         model.train()
         stats = data_helper.AverageMeter('loss', 'cls_loss', 'loc_loss')
 
-        for _, seq, gtscore, cps, n_frames, nfps, picks, _ in train_loader:
+        for _, seq, gtscore, cps, n_frames, nfps, picks, motion_featurs, _ in train_loader:
             keyshot_summ = vsumm_helper.get_keyshot_summ(
                 gtscore, cps, n_frames, nfps, picks)
             target = vsumm_helper.downsample_summ(keyshot_summ)
@@ -101,10 +105,17 @@ def train(args, split, save_path):
 
             cls_label = torch.tensor(cls_label, dtype=torch.float32).to(args.device)
             loc_label = torch.tensor(loc_label, dtype=torch.float32).to(args.device)
-
+            
+            # load features in the model
             seq = torch.tensor(seq, dtype=torch.float32).unsqueeze(0).to(args.device)
+            if motion_featurs is not None:
+                motion_featurs = torch.tensor(motion_featurs, dtype=torch.float32).unsqueeze(0).to(args.device)
+                pred_cls, pred_loc = model(seq, motion_featurs)
+                # print(pred_loc)
 
-            pred_cls, pred_loc = model(seq)
+            else:
+                pred_cls, pred_loc = model(seq)
+            
 
             loc_loss = calc_loc_loss(pred_loc, loc_label, cls_label)
             cls_loss = calc_cls_loss(pred_cls, cls_label)
@@ -127,8 +138,6 @@ def train(args, split, save_path):
         if max_val_fscore < val_fscore:
             max_val_fscore = val_fscore
             torch.save(model.state_dict(), str(save_path))
-
-        end = time.time()
 
         if epoch % 10 == 0:
             if args.where == 'local':

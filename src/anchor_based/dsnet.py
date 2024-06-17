@@ -293,5 +293,75 @@ class DSNet_MultiAttention(nn.Module):
         pred_bboxes = bbox_helper.cw2lr(pred_bboxes)
 
         return pred_cls, pred_bboxes
+    
+
+class DSNetMotionFeatures(nn.Module):
+    def __init__(self, base_model, num_feature, num_hidden, anchor_scales,
+                 num_head):
+        super().__init__()
+        self.anchor_scales = anchor_scales
+        self.num_scales = len(anchor_scales)
+        self.base_model = build_base_model(base_model, num_feature, num_head)
+
+        decoder_layer = nn.TransformerDecoderLayer(d_model=1024 , nhead=8, batch_first=True, dim_feedforward=num_feature)
+        self.multiheadcrossattention = nn.TransformerDecoder(decoder_layer, num_layers=1)
+
+        self.roi_poolings = [nn.AvgPool1d(scale, stride=1, padding=scale // 2)
+                             for scale in anchor_scales]
+
+        self.layer_norm = nn.LayerNorm(num_feature)
+        self.fc_block = nn.Sequential(nn.Linear(num_feature, num_hidden),
+                                      nn.Linear(num_hidden, num_hidden),
+                                      nn.ReLU(),
+                                      nn.Dropout(0.5),
+                                      nn.LayerNorm(num_hidden)
+                                      )
+        
+        self.fc_cls = nn.Linear(num_hidden, 1)
+        self.fc_loc = nn.Linear(num_hidden, 2)
+
+    def forward(self, x, motion_features):
+        _, seq_len, _ = x.shape
+        if self.base_model == 'fourier' or self.base_model == 'fast-fourier':
+            out, _ = self.base_model(x)
+        else:
+            out = self.base_model(x)
+        out = out + x
+
+        # ShapeOfMotionFeatures = motion_features.shape
+        # ShapeOfImageFeatures = out.shape
+
+        # if ShapeOfMotionFeatures == ShapeOfImageFeatures:
+        #     print(f'Shape of motion fetures: {ShapeOfMotionFeatures} and shape of image features: {ShapeOfImageFeatures}, bothe are SAME')
+        # else:
+        #     print(f'Shape of motion fetures: {ShapeOfMotionFeatures} and shape of image features: {ShapeOfImageFeatures}, bothe are NOT SAME')
+
+        out = out + self.multiheadcrossattention(memory=motion_features, tgt=out)
+
+        out = self.fc_block(self.layer_norm(out))
+
+        out = out.transpose(2, 1)
+        pool_results = [roi_pooling(out) for roi_pooling in self.roi_poolings]
+        out = torch.cat(pool_results, dim=0).permute(2, 0, 1)[:-1]
+
+        pred_cls = self.fc_cls(out).sigmoid().view(seq_len, self.num_scales)
+        pred_loc = self.fc_loc(out).view(seq_len, self.num_scales, 2)
+
+        return pred_cls, pred_loc
+
+    def predict(self, seq, motion_features):
+        seq_len = seq.shape[1]
+        pred_cls, pred_loc = self(seq, motion_features)
+
+        pred_cls = pred_cls.cpu().numpy().reshape(-1)
+        pred_loc = pred_loc.cpu().numpy().reshape((-1, 2))
+
+        anchors = anchor_helper.get_anchors(seq_len, self.anchor_scales)
+        anchors = anchors.reshape((-1, 2))
+
+        pred_bboxes = anchor_helper.offset2bbox(pred_loc, anchors)
+        pred_bboxes = bbox_helper.cw2lr(pred_bboxes)
+
+        return pred_cls, pred_bboxes
 
 

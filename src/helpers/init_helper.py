@@ -35,7 +35,7 @@ def get_parser() -> argparse.ArgumentParser:
     parser.add_argument('model', type=str,
                         choices=('anchor-based', 'anchor-free'))
     parser.add_argument('--model-depth', type=str, default='shallow',
-                        choices=['shallow', 'deep', 'local-global-attention', 'triangular'])
+                        choices=['shallow', 'deep', 'local-global-attention', 'triangular', 'cross-attention'])
 
     # training & evaluation
     parser.add_argument('--device', type=str, default='cuda',

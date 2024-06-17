@@ -1,0 +1,125 @@
+- test_keys:
+  - datasets/custom_dataset/summe_resolved.h5/Uncut_Evening_Flight
+  - datasets/custom_dataset/summe_resolved.h5/Paintball
+  - datasets/custom_dataset/summe_resolved.h5/Cockpit_Landing
+  - datasets/custom_dataset/summe_resolved.h5/Fire Domino
+  - datasets/custom_dataset/summe_resolved.h5/Notre_Dame
+  train_keys:
+  - datasets/custom_dataset/summe_resolved.h5/Base jumping
+  - datasets/custom_dataset/summe_resolved.h5/Valparaiso_Downhill
+  - datasets/custom_dataset/summe_resolved.h5/Statue of Liberty
+  - datasets/custom_dataset/summe_resolved.h5/Car_railcrossing
+  - datasets/custom_dataset/summe_resolved.h5/St Maarten Landing
+  - datasets/custom_dataset/summe_resolved.h5/Kids_playing_in_leaves
+  - datasets/custom_dataset/summe_resolved.h5/Air_Force_One
+  - datasets/custom_dataset/summe_resolved.h5/Playing_on_water_slide
+  - datasets/custom_dataset/summe_resolved.h5/Jumps
+  - datasets/custom_dataset/summe_resolved.h5/Bus_in_Rock_Tunnel
+  - datasets/custom_dataset/summe_resolved.h5/car_over_camera
+  - datasets/custom_dataset/summe_resolved.h5/Saving dolphines
+  - datasets/custom_dataset/summe_resolved.h5/Bike Polo
+  - datasets/custom_dataset/summe_resolved.h5/paluma_jump
+  - datasets/custom_dataset/summe_resolved.h5/Eiffel Tower
+  - datasets/custom_dataset/summe_resolved.h5/Excavators river crossing
+  - datasets/custom_dataset/summe_resolved.h5/Bearpark_climbing
+  - datasets/custom_dataset/summe_resolved.h5/Scuba
+- test_keys:
+  - datasets/custom_dataset/summe_resolved.h5/paluma_jump
+  - datasets/custom_dataset/summe_resolved.h5/Air_Force_One
+  - datasets/custom_dataset/summe_resolved.h5/Valparaiso_Downhill
+  - datasets/custom_dataset/summe_resolved.h5/Uncut_Evening_Flight
+  - datasets/custom_dataset/summe_resolved.h5/Bike Polo
+  train_keys:
+  - datasets/custom_dataset/summe_resolved.h5/Base jumping
+  - datasets/custom_dataset/summe_resolved.h5/Statue of Liberty
+  - datasets/custom_dataset/summe_resolved.h5/Car_railcrossing
+  - datasets/custom_dataset/summe_resolved.h5/St Maarten Landing
+  - datasets/custom_dataset/summe_resolved.h5/Kids_playing_in_leaves
+  - datasets/custom_dataset/summe_resolved.h5/Playing_on_water_slide
+  - datasets/custom_dataset/summe_resolved.h5/Jumps
+  - datasets/custom_dataset/summe_resolved.h5/Notre_Dame
+  - datasets/custom_dataset/summe_resolved.h5/car_over_camera
+  - datasets/custom_dataset/summe_resolved.h5/Bus_in_Rock_Tunnel
+  - datasets/custom_dataset/summe_resolved.h5/Paintball
+  - datasets/custom_dataset/summe_resolved.h5/Saving dolphines
+  - datasets/custom_dataset/summe_resolved.h5/Fire Domino
+  - datasets/custom_dataset/summe_resolved.h5/Eiffel Tower
+  - datasets/custom_dataset/summe_resolved.h5/Excavators river crossing
+  - datasets/custom_dataset/summe_resolved.h5/Bearpark_climbing
+  - datasets/custom_dataset/summe_resolved.h5/Cockpit_Landing
+  - datasets/custom_dataset/summe_resolved.h5/Scuba
+- test_keys:
+  - datasets/custom_dataset/summe_resolved.h5/Cockpit_Landing
+  - datasets/custom_dataset/summe_resolved.h5/Bike Polo
+  - datasets/custom_dataset/summe_resolved.h5/Kids_playing_in_leaves
+  - datasets/custom_dataset/summe_resolved.h5/paluma_jump
+  - datasets/custom_dataset/summe_resolved.h5/Paintball
+  train_keys:
+  - datasets/custom_dataset/summe_resolved.h5/Base jumping
+  - datasets/custom_dataset/summe_resolved.h5/Valparaiso_Downhill
+  - datasets/custom_dataset/summe_resolved.h5/Statue of Liberty
+  - datasets/custom_dataset/summe_resolved.h5/Car_railcrossing
+  - datasets/custom_dataset/summe_resolved.h5/St Maarten Landing
+  - datasets/custom_dataset/summe_resolved.h5/Playing_on_water_slide
+  - datasets/custom_dataset/summe_resolved.h5/Air_Force_One
+  - datasets/custom_dataset/summe_resolved.h5/Jumps
+  - datasets/custom_dataset/summe_resolved.h5/Bus_in_Rock_Tunnel
+  - datasets/custom_dataset/summe_resolved.h5/car_over_camera
+  - datasets/custom_dataset/summe_resolved.h5/Notre_Dame
+  - datasets/custom_dataset/summe_resolved.h5/Saving dolphines
+  - datasets/custom_dataset/summe_resolved.h5/Fire Domino
+  - datasets/custom_dataset/summe_resolved.h5/Eiffel Tower
+  - datasets/custom_dataset/summe_resolved.h5/Excavators river crossing
+  - datasets/custom_dataset/summe_resolved.h5/Bearpark_climbing
+  - datasets/custom_dataset/summe_resolved.h5/Uncut_Evening_Flight
+  - datasets/custom_dataset/summe_resolved.h5/Scuba
+- test_keys:
+  - datasets/custom_dataset/summe_resolved.h5/Cockpit_Landing
+  - datasets/custom_dataset/summe_resolved.h5/Paintball
+  - datasets/custom_dataset/summe_resolved.h5/Fire Domino
+  - datasets/custom_dataset/summe_resolved.h5/Scuba
+  - datasets/custom_dataset/summe_resolved.h5/paluma_jump
+  train_keys:
+  - datasets/custom_dataset/summe_resolved.h5/Base jumping
+  - datasets/custom_dataset/summe_resolved.h5/Valparaiso_Downhill
+  - datasets/custom_dataset/summe_resolved.h5/Statue of Liberty
+  - datasets/custom_dataset/summe_resolved.h5/Car_railcrossing
+  - datasets/custom_dataset/summe_resolved.h5/St Maarten Landing
+  - datasets/custom_dataset/summe_resolved.h5/Kids_playing_in_leaves
+  - datasets/custom_dataset/summe_resolved.h5/Air_Force_One
+  - datasets/custom_dataset/summe_resolved.h5/Playing_on_water_slide
+  - datasets/custom_dataset/summe_resolved.h5/Jumps
+  - datasets/custom_dataset/summe_resolved.h5/Notre_Dame
+  - datasets/custom_dataset/summe_resolved.h5/Bus_in_Rock_Tunnel
+  - datasets/custom_dataset/summe_resolved.h5/car_over_camera
+  - datasets/custom_dataset/summe_resolved.h5/Saving dolphines
+  - datasets/custom_dataset/summe_resolved.h5/Bike Polo
+  - datasets/custom_dataset/summe_resolved.h5/Eiffel Tower
+  - datasets/custom_dataset/summe_resolved.h5/Excavators river crossing
+  - datasets/custom_dataset/summe_resolved.h5/Bearpark_climbing
+  - datasets/custom_dataset/summe_resolved.h5/Uncut_Evening_Flight
+- test_keys:
+  - datasets/custom_dataset/summe_resolved.h5/Scuba
+  - datasets/custom_dataset/summe_resolved.h5/St Maarten Landing
+  - datasets/custom_dataset/summe_resolved.h5/Fire Domino
+  - datasets/custom_dataset/summe_resolved.h5/Playing_on_water_slide
+  - datasets/custom_dataset/summe_resolved.h5/Air_Force_One
+  train_keys:
+  - datasets/custom_dataset/summe_resolved.h5/Base jumping
+  - datasets/custom_dataset/summe_resolved.h5/Valparaiso_Downhill
+  - datasets/custom_dataset/summe_resolved.h5/Statue of Liberty
+  - datasets/custom_dataset/summe_resolved.h5/Car_railcrossing
+  - datasets/custom_dataset/summe_resolved.h5/Kids_playing_in_leaves
+  - datasets/custom_dataset/summe_resolved.h5/Jumps
+  - datasets/custom_dataset/summe_resolved.h5/Notre_Dame
+  - datasets/custom_dataset/summe_resolved.h5/Paintball
+  - datasets/custom_dataset/summe_resolved.h5/car_over_camera
+  - datasets/custom_dataset/summe_resolved.h5/Bus_in_Rock_Tunnel
+  - datasets/custom_dataset/summe_resolved.h5/Saving dolphines
+  - datasets/custom_dataset/summe_resolved.h5/Bike Polo
+  - datasets/custom_dataset/summe_resolved.h5/paluma_jump
+  - datasets/custom_dataset/summe_resolved.h5/Eiffel Tower
+  - datasets/custom_dataset/summe_resolved.h5/Excavators river crossing
+  - datasets/custom_dataset/summe_resolved.h5/Bearpark_climbing
+  - datasets/custom_dataset/summe_resolved.h5/Cockpit_Landing
+  - datasets/custom_dataset/summe_resolved.h5/Uncut_Evening_Flight

@@ -1,7 +1,7 @@
 from typing import Iterable, List
 
 import numpy as np
-from ortools.algorithms.pywrapknapsack_solver import KnapsackSolver
+from ortools.algorithms.python import knapsack_solver as ks
 
 
 def f1_score(pred: np.ndarray, test: np.ndarray) -> float:
@@ -23,10 +23,7 @@ def f1_score(pred: np.ndarray, test: np.ndarray) -> float:
     return float(f1)
 
 
-def knapsack(values: Iterable[int],
-             weights: Iterable[int],
-             capacity: int
-             ) -> List[int]:
+def knapsack(values: Iterable[int], weights: Iterable[int], capacity: int) -> List[int]:
     """Solve 0/1 knapsack problem using dynamic programming.
 
     :param values: Values of each items. Sized [N].
@@ -34,18 +31,16 @@ def knapsack(values: Iterable[int],
     :param capacity: Total capacity of the knapsack.
     :return: List of packed item indices.
     """
-    knapsack_solver = KnapsackSolver(
-        KnapsackSolver.KNAPSACK_DYNAMIC_PROGRAMMING_SOLVER, 'test'
-    )
+    solver = ks.KnapsackSolver(
+        ks.SolverType.KNAPSACK_MULTIDIMENSION_BRANCH_AND_BOUND_SOLVER, 'test')
 
     values = list(values)
     weights = list(weights)
     capacity = int(capacity)
 
-    knapsack_solver.Init(values, [weights], [capacity])
-    knapsack_solver.Solve()
-    packed_items = [x for x in range(0, len(weights))
-                    if knapsack_solver.BestSolutionContains(x)]
+    solver.init(values, [weights], [capacity])
+    computed_value = solver.solve()
+    packed_items = [x for x in range(len(weights)) if solver.best_solution_contains(x)]
 
     return packed_items
 
@@ -85,7 +80,11 @@ def get_keyshot_summ(pred: np.ndarray,
     # Assign scores to video shots as the average of the frames.
     seg_scores = np.zeros(len(cps), dtype=np.int32)
     for seg_idx, (first, last) in enumerate(cps):
-        scores = frame_scores[first:last + 1]
+        scores = np.array(frame_scores[first:last + 1])
+        # print(scores)
+        # print(scores.shape)
+        # print(np.unique(scores))
+        # print(np.count_nonzero(scores))
         seg_scores[seg_idx] = int(1000 * scores.mean())
 
     # Apply knapsack algorithm to find the best shots

@@ -69,14 +69,6 @@ def main():
             # compute ground truth frame scores
             gtscore = np.mean(user_summary[:, ::args.sample_rate], axis=0)
 
-            # load motin features
-            if args.motion_feature is not None:
-                motion_feature_path = motion_features_paths[idx]
-                motion_features = np.load(motion_feature_path)
-                motion_features = motion_features[::1, ::args.sample_rate]
-                print(f'Loaded motion features of size {motion_features.shape}')
-                # assert motion_features.shape[0] == n_frames, f'Invalid motion features of size {motion_features.shape[0]}: expected {n_frames}'
-
             # write dataset to h5 file
             video_key = f'{video_name}'
             h5out.create_dataset(f'{video_key}/features', data=features)
@@ -87,7 +79,18 @@ def main():
             h5out.create_dataset(f'{video_key}/n_frames', data=n_frames)
             h5out.create_dataset(f'{video_key}/picks', data=picks)
             h5out.create_dataset(f'{video_key}/video_name', data=video_name)
-            h5out.create_dataset(f'{video_key}/motion_features', data=motion_features)
+            
+
+            # load motin features
+            if args.motion_feature is not None:
+                motion_feature_path = motion_features_paths[idx]
+                motion_features = np.load(motion_feature_path)
+                motion_features = motion_features[::args.sample_rate, ::1]
+                print(f'Loaded motion features of size {motion_features.shape}')
+                # assert motion_features.shape[0] == n_frames, f'Invalid motion features of size {motion_features.shape[0]}: expected {n_frames}'
+                h5out.create_dataset(f'{video_key}/motion_features', data=motion_features)
+
+            
 
     print(f'Dataset saved to {args.save_path}')
 
