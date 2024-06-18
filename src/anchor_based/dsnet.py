@@ -286,12 +286,7 @@ class DSNetMotionFeatures(nn.Module):
 
     def forward(self, x, motion_features):
         _, seq_len, _ = x.shape
-        if self.base_model == 'fourier' or self.base_model == 'fast-fourier':
-            out, _ = self.base_model(x)
-        else:
-            out = self.base_model(x)
-        out = out + x
-
+        out = self.encoder(x)
         out = out + self.multiheadcrossattention(memory=motion_features, tgt=out)
 
         out = self.fc_block(self.layer_norm(out))
