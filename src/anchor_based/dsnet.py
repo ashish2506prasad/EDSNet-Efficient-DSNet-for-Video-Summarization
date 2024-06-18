@@ -260,6 +260,7 @@ class DSNetMotionFeatures(nn.Module):
         super().__init__()
         self.anchor_scales = anchor_scales
         self.num_scales = len(anchor_scales)
+        self.base_model = base_model
         
         if encoder_type == 'classic':
             self.encoder = ClassicEncoder(base_model, num_feature, num_head, attention_depth)
