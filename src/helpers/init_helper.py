@@ -51,6 +51,8 @@ def get_parser() -> argparse.ArgumentParser:
     parser.add_argument('--nms-thresh', type=float, default=0.5)
     parser.add_argument('--fc-depth', type=int, default=5)
     parser.add_argument('--attention-depth', type=int, default=2)
+    parser.add_argument('--encoder-type', type=str, default='classic',
+                        choices=['classic', 'local-global'])
 
     # inference
     parser.add_argument('--ckpt-path', type=str, default=None)

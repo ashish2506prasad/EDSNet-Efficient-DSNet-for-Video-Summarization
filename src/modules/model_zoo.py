@@ -8,7 +8,7 @@ from anchor_based.fourier_ab_models import DSNet_fourier
 
 
 def get_anchor_based( base_model, num_feature, num_hidden, anchor_scales,
-                     num_head, fc_depth, attention_depth, **kwargs):
+                     num_head, fc_depth, attention_depth, encoder_type, **kwargs):
     args = init_helper.get_arguments()
     if args.model_depth == 'shallow':
         return DSNet(base_model, num_feature, num_hidden, anchor_scales, num_head, fc_depth)
@@ -19,7 +19,7 @@ def get_anchor_based( base_model, num_feature, num_hidden, anchor_scales,
     elif args.model_depth == 'triangular':
         return DSNetTriangularAttention(base_model, num_feature, num_hidden, anchor_scales, num_head)
     elif args.model_depth == 'cross-attention':
-        return DSNetMotionFeatures(base_model, num_feature, num_hidden, anchor_scales, num_head)
+        return DSNetMotionFeatures(base_model, num_feature, num_hidden, anchor_scales, num_head, attention_depth, encoder_type)
     
 
 def get_anchor_free(base_model, num_feature, num_hidden, num_head, **kwargs):

@@ -45,7 +45,7 @@ def train(args, split, save_path):
     elif args.model_depth == 'cross-attention':
         model = DSNetMotionFeatures(base_model=args.base_model, num_feature=args.num_feature,
                     num_hidden=args.num_hidden, anchor_scales=args.anchor_scales,
-                    num_head=args.num_head)
+                    num_head=args.num_head, attention_depth=args.attention_depth, encoder_type=args.encoder_type)
     model = model.to(args.device)
 
     model.apply(xavier_init)
@@ -139,7 +139,7 @@ def train(args, split, save_path):
             max_val_fscore = val_fscore
             torch.save(model.state_dict(), str(save_path))
 
-        if epoch % 10 == 0:
+        if epoch % 20 == 0:
             if args.where == 'local':
                 logger.info(f'Epoch: {epoch}/{args.max_epoch} '
                             f'Loss: {stats.cls_loss:.4f}/{stats.loc_loss:.4f}/{stats.loss:.4f} '

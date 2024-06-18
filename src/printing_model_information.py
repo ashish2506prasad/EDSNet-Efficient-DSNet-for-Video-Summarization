@@ -52,7 +52,7 @@ def model_summary(model):
             print("printing model summary (cross-attention): ")
             summary(DSNetMotionFeatures(base_model=args.base_model, num_feature=args.num_feature,
                     num_hidden=args.num_hidden, anchor_scales=args.anchor_scales,
-                    num_head=args.num_head))
+                    num_head=args.num_head, attention_depth=args.attention_depth, encoder_type=args.encoder_type))
         else:
             raise ValueError(f'Invalid model type: {model}')
 

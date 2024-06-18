@@ -5,7 +5,7 @@ from anchor_based import anchor_helper
 from helpers import bbox_helper
 from modules.models import build_base_model
 import torch.nn.functional as F
-import math
+from modules.encoder import ClassicEncoder, MultiAttention, LocalGlobalEncoder
 
 class DSNet(nn.Module):
     def __init__(self, base_model, num_feature, num_hidden, anchor_scales,
@@ -192,47 +192,6 @@ class DSNetTriangularAttention(nn.Module):
         pred_bboxes = bbox_helper.cw2lr(pred_bboxes)
 
         return pred_cls, pred_bboxes
-
-
-class MultiAttention(nn.Module):
-    def __init__(self, num_feature, base_model, num_segments=5, num_head=8, local_attention_head=4):
-        super(MultiAttention, self).__init__()
-
-        self.num_segments = num_segments
-        self.global_attention = build_base_model(base_model, num_feature, num_head)
-        self.layer_norm = nn.LayerNorm(num_feature)
-        self.fc = nn.Sequential(nn.Linear(num_feature, num_feature),
-                                nn.ReLU())
-
-        if self.num_segments is not None:
-            assert self.num_segments >= 2, "num_segments must be None or 2+"
-            self.local_attention = nn.ModuleList()
-            for _ in range(self.num_segments):
-                self.local_attention.append(build_base_model(base_model, num_feature, num_head=local_attention_head))
-
-    def forward(self, x):
-        weighted_value = self.fc(self.global_attention(x))
-
-        if self.num_segments is not None:
-            segment_size = math.ceil(x.shape[-2] / self.num_segments)
-            for segment in range(self.num_segments):
-                left_pos = segment * segment_size
-                right_pos = (segment + 1) * segment_size
-                local_x = x[:, left_pos:right_pos, :]
-                weighted_local_value = self.fc(self.local_attention[segment](local_x))
-
-                normalized_global_value = F.normalize(weighted_value[:, left_pos:right_pos, :], p=2, dim=-1)
-                normalized_local_value = F.normalize(weighted_local_value, p=2, dim=-1)
-
-                # Avoid in-place operation
-                weighted_value = torch.cat((
-                    weighted_value[:, :left_pos, :],
-                    normalized_global_value + normalized_local_value,
-                    weighted_value[:, right_pos:, :]
-                ), dim=1)
-
-        return weighted_value
-
         
 
 class DSNet_MultiAttention(nn.Module):
@@ -297,14 +256,18 @@ class DSNet_MultiAttention(nn.Module):
 
 class DSNetMotionFeatures(nn.Module):
     def __init__(self, base_model, num_feature, num_hidden, anchor_scales,
-                 num_head):
+                 num_head, attention_depth, encoder_type='classic'):
         super().__init__()
         self.anchor_scales = anchor_scales
         self.num_scales = len(anchor_scales)
-        self.base_model = build_base_model(base_model, num_feature, num_head)
+        
+        if encoder_type == 'classic':
+            self.encoder = ClassicEncoder(base_model, num_feature, num_head, attention_depth)
+        elif encoder_type == 'local_global':
+            self.encoder = LocalGlobalEncoder(base_model, num_feature, num_head, attention_depth)
 
         decoder_layer = nn.TransformerDecoderLayer(d_model=1024 , nhead=8, batch_first=True, dim_feedforward=num_feature)
-        self.multiheadcrossattention = nn.TransformerDecoder(decoder_layer, num_layers=1)
+        self.multiheadcrossattention = nn.TransformerDecoder(decoder_layer, num_layers=attention_depth)
 
         self.roi_poolings = [nn.AvgPool1d(scale, stride=1, padding=scale // 2)
                              for scale in anchor_scales]
@@ -327,14 +290,6 @@ class DSNetMotionFeatures(nn.Module):
         else:
             out = self.base_model(x)
         out = out + x
-
-        # ShapeOfMotionFeatures = motion_features.shape
-        # ShapeOfImageFeatures = out.shape
-
-        # if ShapeOfMotionFeatures == ShapeOfImageFeatures:
-        #     print(f'Shape of motion fetures: {ShapeOfMotionFeatures} and shape of image features: {ShapeOfImageFeatures}, bothe are SAME')
-        # else:
-        #     print(f'Shape of motion fetures: {ShapeOfMotionFeatures} and shape of image features: {ShapeOfImageFeatures}, bothe are NOT SAME')
 
         out = out + self.multiheadcrossattention(memory=motion_features, tgt=out)
 
