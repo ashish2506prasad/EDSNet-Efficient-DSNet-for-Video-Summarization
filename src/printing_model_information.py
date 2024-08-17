@@ -6,7 +6,7 @@ import torch
 from torch import nn
 from helpers import init_helper, data_helper
 from anchor_based import anchor_helper
-from anchor_based.dsnet import DSNet, DSNet_DeepAttention, DSNet_MultiAttention, DSNetTriangularAttention, DSNetMotionFeatures
+from anchor_based.dsnet import DSNet, DSNet_DeepAttention, DSNet_MultiAttention, DSNetMotionFeatures
 from torchinfo import summary
 
 from anchor_free.dsnet_af import DSNetAF, DSNetAF_DeepAttention
@@ -32,27 +32,27 @@ def model_summary(model):
             print("printing model summary (shallow): ")
             summary(DSNet(base_model=args.base_model, num_feature=args.num_feature,
                     num_hidden=args.num_hidden, anchor_scales=args.anchor_scales,
-                    num_head=args.num_head, fc_depth=args.fc_depth))
+                    num_head=args.num_head, fc_depth=args.fc_depth, orientation=args.orientation))
         elif args.model_depth == 'deep':
             print("printing model summary (deep attention): ")
             summary(DSNet_DeepAttention(base_model=args.base_model, num_feature=args.num_feature,
                     num_hidden=args.num_hidden, anchor_scales=args.anchor_scales,
-                    num_head=args.num_head, fc_depth=args.fc_depth, attention_depth=args.attention_depth))
+                    num_head=args.num_head, fc_depth=args.fc_depth, attention_depth=args.attention_depth, orientation=args.orientation))
         elif args.model_depth == 'local-global-attention':
             print("printing model summary (local-global-attention): ")
             summary(DSNet_MultiAttention(base_model=args.base_model, num_feature=args.num_feature,
                     num_hidden=args.num_hidden, anchor_scales=args.anchor_scales,
-                    num_head=args.num_head))
-        elif args.model_depth == 'triangular':
-            print("printing model summary (triangular-attention): ")
-            summary(DSNetTriangularAttention(base_model=args.base_model, num_feature=args.num_feature,
-                    num_hidden=args.num_hidden, anchor_scales=args.anchor_scales,
-                    num_head=args.num_head))
+                    num_head=args.num_head, fc_depth=args.fc_depth, orientation=args.orientation))
         elif args.model_depth == 'cross-attention':
             print("printing model summary (cross-attention): ")
             summary(DSNetMotionFeatures(base_model=args.base_model, num_feature=args.num_feature,
                     num_hidden=args.num_hidden, anchor_scales=args.anchor_scales,
                     num_head=args.num_head, attention_depth=args.attention_depth, encoder_type=args.encoder_type))
+        elif args.model_depth == 'original':
+            print("printing model summary (original): ")
+            summary(DSNet(base_model=args.base_model, num_feature=args.num_feature,
+                    num_hidden=args.num_hidden, anchor_scales=args.anchor_scales,
+                    num_head=args.num_head))
         else:
             raise ValueError(f'Invalid model type: {model}')
 
@@ -62,11 +62,19 @@ def model_summary(model):
         if args.model_depth == 'shallow':
             print("printing model summary (shallow): ")
             summary(DSNetAF(base_model=args.base_model, num_feature=args.num_feature,
-                    num_hidden=args.num_hidden, num_head=args.num_head))
+                    num_hidden=args.num_hidden, num_head=args.num_head, fc_depth=args.fc_depth, orientation=args.orientation))
         elif args.model_depth == 'deep':
             print("printing model summary (deep attention): ")
             summary(DSNetAF_DeepAttention(base_model=args.base_model, num_feature=args.num_feature,
+                    num_hidden=args.num_hidden, num_head=args.num_head, fc_depth=args.fc_depth, orientation=args.orientation))
+        elif args.model_depth == 'original':
+            print("printing model summary (original): ")
+            summary(DSNetAF(base_model=args.base_model, num_feature=args.num_feature,
                     num_hidden=args.num_hidden, num_head=args.num_head))
+        elif args.model_depth == 'local-global-attention':
+            print("printing model summary (local-global-attention): ")
+            summary(DSNet_MultiAttention(base_model=args.base_model, num_feature=args.num_feature,
+                    num_hidden=args.num_hidden, num_head=args.num_head, fc_depth=args.fc_depth, orientation=args.orientation))
         else:
             raise ValueError(f'Invalid model type: {model}')
     else:

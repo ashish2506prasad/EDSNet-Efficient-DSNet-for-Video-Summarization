@@ -1,7 +1,7 @@
 import argparse
 import json
 from pathlib import Path
-
+import math
 import h5py
 import numpy as np
 from tqdm import tqdm
@@ -26,7 +26,7 @@ def main():
 
     # annotation directory
     label_dir = Path(args.label_dir)
-    
+     
 
     # feature extractor
     print('Loading feature extractor ...')
@@ -48,7 +48,7 @@ def main():
     with h5py.File(args.save_path, 'w') as h5out:
         for idx, video_path in tqdm(list(enumerate(video_paths))):
             n_frames, features, cps, nfps, picks = video_proc.run(video_path)
-
+            print(features.shape)
             # load labels
             video_name = video_list[idx].split('.')[0]
             label_path = label_dir / f'{video_name}.json'
@@ -64,9 +64,17 @@ def main():
                 assert n_frames == label_n_frames, f'Invalid label of size {user_summary.shape[1]}: expected {n_frames}'
             except AssertionError:
                 print(f'Invalid label of size {user_summary.shape[1]}: expected {n_frames}')
+                if (n_frames - label_n_frames) < 5 or (label_n_frames-n_frames)<5:
+                    if n_frames > label_n_frames:
+                        print("trimming the video")
+                        features = features[:, :label_n_frames]
+                    else:
+                        print("trimming the lables")
+                        user_summary = user_summary[:,:n_frames]
                 continue
 
             # compute ground truth frame scores
+            # sample_rate = nfps/2
             gtscore = np.mean(user_summary[:, ::args.sample_rate], axis=0)
 
             # write dataset to h5 file

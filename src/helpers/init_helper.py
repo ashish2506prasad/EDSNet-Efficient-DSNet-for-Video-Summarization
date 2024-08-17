@@ -35,7 +35,8 @@ def get_parser() -> argparse.ArgumentParser:
     parser.add_argument('model', type=str,
                         choices=('anchor-based', 'anchor-free'))
     parser.add_argument('--model-depth', type=str, default='shallow',
-                        choices=['shallow', 'deep', 'local-global-attention', 'triangular', 'cross-attention'])
+                        choices=['shallow', 'deep', 'local-global-attention', 'cross-attention'])
+    parser.add_argument('--orientation', type=str, choices=['paper', 'temporal', 'feature_wise'], default='paper')
 
     # training & evaluation
     parser.add_argument('--device', type=str, default='cuda',
@@ -49,7 +50,7 @@ def get_parser() -> argparse.ArgumentParser:
     parser.add_argument('--weight-decay', type=float, default=1e-5)
     parser.add_argument('--lambda-reg', type=float, default=1.0)
     parser.add_argument('--nms-thresh', type=float, default=0.5)
-    parser.add_argument('--fc-depth', type=int, default=5)
+    parser.add_argument('--fc-depth', type=int, default=7)
     parser.add_argument('--attention-depth', type=int, default=2)
     parser.add_argument('--encoder-type', type=str, default='classic',
                         choices=['classic', 'local-global'])

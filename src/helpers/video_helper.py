@@ -47,10 +47,16 @@ class FeatureExtractor(object):
             self.model = model_swin_b
 
         elif feature_extractor == 'convnext':
-            model_convnext = models.convnext_large(pretrained=True)
+            model_convnext = models.convnext_base(pretrained=True)
             model_convnext = nn.Sequential(*list(model_convnext.children())[:-1])
             model_convnext = model_convnext.cuda().eval()
             self.model = model_convnext
+
+        # elif feature_extractor == 'wavemix':
+
+        # elif feature_extractor == 'vgg_net':
+        #     model_vgg = models.vgg
+
 
 
     def run(self, img: np.ndarray) -> np.ndarray:

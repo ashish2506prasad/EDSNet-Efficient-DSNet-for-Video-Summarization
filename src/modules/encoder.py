@@ -29,11 +29,11 @@ class ClassicEncoder(nn.Module):
     
 
 class MultiAttention(nn.Module):
-    def __init__(self, num_feature, base_model, num_segments=5, num_head=8, local_attention_head=4):
+    def __init__(self, num_feature, base_model, orientation, num_segments=5, num_head=8, local_attention_head=4):
         super(MultiAttention, self).__init__()
 
         self.num_segments = num_segments
-        self.global_attention = build_base_model(base_model, num_feature, num_head)
+        self.global_attention = build_base_model(base_model, num_feature, num_head, orientation)
         self.layer_norm = nn.LayerNorm(num_feature)
         self.fc = nn.Sequential(nn.Linear(num_feature, num_feature),
                                 nn.ReLU())
@@ -42,7 +42,7 @@ class MultiAttention(nn.Module):
             assert self.num_segments >= 2, "num_segments must be None or 2+"
             self.local_attention = nn.ModuleList()
             for _ in range(self.num_segments):
-                self.local_attention.append(build_base_model(base_model, num_feature, num_head=local_attention_head))
+                self.local_attention.append(build_base_model(base_model, num_feature, num_head=local_attention_head, orientation=orientation))
 
     def forward(self, x):
         weighted_value = self.fc(self.global_attention(x))
@@ -69,9 +69,9 @@ class MultiAttention(nn.Module):
     
 
 class LocalGlobalEncoder(nn.Module):
-    def __init__(self, base_model, num_feature, num_head, num_segments, local_attention_head):
+    def __init__(self, base_model, orientation, num_feature, num_head, num_segments, local_attention_head):
         super(LocalGlobalEncoder, self).__init__()
-        self.multi_attention = MultiAttention(num_feature, base_model, num_segments, num_head, local_attention_head)
+        self.multi_attention = MultiAttention(num_feature, base_model, orientation, num_segments, num_head, local_attention_head)
         self.layer_norm = nn.LayerNorm(num_feature)
         self.fc = nn.Sequential(nn.Linear(num_feature, num_feature),
                                 nn.ReLU())

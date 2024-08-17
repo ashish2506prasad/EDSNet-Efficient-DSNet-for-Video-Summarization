@@ -1,0 +1,125 @@
+- test_keys:
+  - datasets/custom_dataset/summe_swintransformer.h5/Uncut_Evening_Flight
+  - datasets/custom_dataset/summe_swintransformer.h5/Base jumping
+  - datasets/custom_dataset/summe_swintransformer.h5/Statue of Liberty
+  - datasets/custom_dataset/summe_swintransformer.h5/Kids_playing_in_leaves
+  - datasets/custom_dataset/summe_swintransformer.h5/Excavators river crossing
+  train_keys:
+  - datasets/custom_dataset/summe_swintransformer.h5/Car_railcrossing
+  - datasets/custom_dataset/summe_swintransformer.h5/Eiffel Tower
+  - datasets/custom_dataset/summe_swintransformer.h5/Saving dolphines
+  - datasets/custom_dataset/summe_swintransformer.h5/Playing_on_water_slide
+  - datasets/custom_dataset/summe_swintransformer.h5/Paintball
+  - datasets/custom_dataset/summe_swintransformer.h5/Fire Domino
+  - datasets/custom_dataset/summe_swintransformer.h5/Scuba
+  - datasets/custom_dataset/summe_swintransformer.h5/Valparaiso_Downhill
+  - datasets/custom_dataset/summe_swintransformer.h5/Bike Polo
+  - datasets/custom_dataset/summe_swintransformer.h5/Jumps
+  - datasets/custom_dataset/summe_swintransformer.h5/Notre_Dame
+  - datasets/custom_dataset/summe_swintransformer.h5/Cockpit_Landing
+  - datasets/custom_dataset/summe_swintransformer.h5/Bus_in_Rock_Tunnel
+  - datasets/custom_dataset/summe_swintransformer.h5/St Maarten Landing
+  - datasets/custom_dataset/summe_swintransformer.h5/car_over_camera
+  - datasets/custom_dataset/summe_swintransformer.h5/paluma_jump
+  - datasets/custom_dataset/summe_swintransformer.h5/Bearpark_climbing
+  - datasets/custom_dataset/summe_swintransformer.h5/Air_Force_One
+- test_keys:
+  - datasets/custom_dataset/summe_swintransformer.h5/Jumps
+  - datasets/custom_dataset/summe_swintransformer.h5/Notre_Dame
+  - datasets/custom_dataset/summe_swintransformer.h5/Bus_in_Rock_Tunnel
+  - datasets/custom_dataset/summe_swintransformer.h5/Fire Domino
+  - datasets/custom_dataset/summe_swintransformer.h5/Playing_on_water_slide
+  train_keys:
+  - datasets/custom_dataset/summe_swintransformer.h5/Kids_playing_in_leaves
+  - datasets/custom_dataset/summe_swintransformer.h5/Eiffel Tower
+  - datasets/custom_dataset/summe_swintransformer.h5/Car_railcrossing
+  - datasets/custom_dataset/summe_swintransformer.h5/Saving dolphines
+  - datasets/custom_dataset/summe_swintransformer.h5/Paintball
+  - datasets/custom_dataset/summe_swintransformer.h5/Uncut_Evening_Flight
+  - datasets/custom_dataset/summe_swintransformer.h5/Base jumping
+  - datasets/custom_dataset/summe_swintransformer.h5/Scuba
+  - datasets/custom_dataset/summe_swintransformer.h5/Valparaiso_Downhill
+  - datasets/custom_dataset/summe_swintransformer.h5/Bike Polo
+  - datasets/custom_dataset/summe_swintransformer.h5/Excavators river crossing
+  - datasets/custom_dataset/summe_swintransformer.h5/Cockpit_Landing
+  - datasets/custom_dataset/summe_swintransformer.h5/Statue of Liberty
+  - datasets/custom_dataset/summe_swintransformer.h5/St Maarten Landing
+  - datasets/custom_dataset/summe_swintransformer.h5/car_over_camera
+  - datasets/custom_dataset/summe_swintransformer.h5/paluma_jump
+  - datasets/custom_dataset/summe_swintransformer.h5/Bearpark_climbing
+  - datasets/custom_dataset/summe_swintransformer.h5/Air_Force_One
+- test_keys:
+  - datasets/custom_dataset/summe_swintransformer.h5/Scuba
+  - datasets/custom_dataset/summe_swintransformer.h5/Bike Polo
+  - datasets/custom_dataset/summe_swintransformer.h5/Statue of Liberty
+  - datasets/custom_dataset/summe_swintransformer.h5/Uncut_Evening_Flight
+  - datasets/custom_dataset/summe_swintransformer.h5/Car_railcrossing
+  train_keys:
+  - datasets/custom_dataset/summe_swintransformer.h5/Kids_playing_in_leaves
+  - datasets/custom_dataset/summe_swintransformer.h5/Eiffel Tower
+  - datasets/custom_dataset/summe_swintransformer.h5/Saving dolphines
+  - datasets/custom_dataset/summe_swintransformer.h5/Playing_on_water_slide
+  - datasets/custom_dataset/summe_swintransformer.h5/Paintball
+  - datasets/custom_dataset/summe_swintransformer.h5/Fire Domino
+  - datasets/custom_dataset/summe_swintransformer.h5/Base jumping
+  - datasets/custom_dataset/summe_swintransformer.h5/Jumps
+  - datasets/custom_dataset/summe_swintransformer.h5/Valparaiso_Downhill
+  - datasets/custom_dataset/summe_swintransformer.h5/Excavators river crossing
+  - datasets/custom_dataset/summe_swintransformer.h5/Notre_Dame
+  - datasets/custom_dataset/summe_swintransformer.h5/Cockpit_Landing
+  - datasets/custom_dataset/summe_swintransformer.h5/Bus_in_Rock_Tunnel
+  - datasets/custom_dataset/summe_swintransformer.h5/St Maarten Landing
+  - datasets/custom_dataset/summe_swintransformer.h5/car_over_camera
+  - datasets/custom_dataset/summe_swintransformer.h5/paluma_jump
+  - datasets/custom_dataset/summe_swintransformer.h5/Bearpark_climbing
+  - datasets/custom_dataset/summe_swintransformer.h5/Air_Force_One
+- test_keys:
+  - datasets/custom_dataset/summe_swintransformer.h5/St Maarten Landing
+  - datasets/custom_dataset/summe_swintransformer.h5/Paintball
+  - datasets/custom_dataset/summe_swintransformer.h5/Bearpark_climbing
+  - datasets/custom_dataset/summe_swintransformer.h5/Jumps
+  - datasets/custom_dataset/summe_swintransformer.h5/Valparaiso_Downhill
+  train_keys:
+  - datasets/custom_dataset/summe_swintransformer.h5/Kids_playing_in_leaves
+  - datasets/custom_dataset/summe_swintransformer.h5/Car_railcrossing
+  - datasets/custom_dataset/summe_swintransformer.h5/Eiffel Tower
+  - datasets/custom_dataset/summe_swintransformer.h5/Playing_on_water_slide
+  - datasets/custom_dataset/summe_swintransformer.h5/Saving dolphines
+  - datasets/custom_dataset/summe_swintransformer.h5/Fire Domino
+  - datasets/custom_dataset/summe_swintransformer.h5/Base jumping
+  - datasets/custom_dataset/summe_swintransformer.h5/Uncut_Evening_Flight
+  - datasets/custom_dataset/summe_swintransformer.h5/Bike Polo
+  - datasets/custom_dataset/summe_swintransformer.h5/Excavators river crossing
+  - datasets/custom_dataset/summe_swintransformer.h5/Notre_Dame
+  - datasets/custom_dataset/summe_swintransformer.h5/Cockpit_Landing
+  - datasets/custom_dataset/summe_swintransformer.h5/Bus_in_Rock_Tunnel
+  - datasets/custom_dataset/summe_swintransformer.h5/Statue of Liberty
+  - datasets/custom_dataset/summe_swintransformer.h5/car_over_camera
+  - datasets/custom_dataset/summe_swintransformer.h5/paluma_jump
+  - datasets/custom_dataset/summe_swintransformer.h5/Scuba
+  - datasets/custom_dataset/summe_swintransformer.h5/Air_Force_One
+- test_keys:
+  - datasets/custom_dataset/summe_swintransformer.h5/Saving dolphines
+  - datasets/custom_dataset/summe_swintransformer.h5/Bus_in_Rock_Tunnel
+  - datasets/custom_dataset/summe_swintransformer.h5/Car_railcrossing
+  - datasets/custom_dataset/summe_swintransformer.h5/paluma_jump
+  - datasets/custom_dataset/summe_swintransformer.h5/Notre_Dame
+  train_keys:
+  - datasets/custom_dataset/summe_swintransformer.h5/Kids_playing_in_leaves
+  - datasets/custom_dataset/summe_swintransformer.h5/Eiffel Tower
+  - datasets/custom_dataset/summe_swintransformer.h5/Paintball
+  - datasets/custom_dataset/summe_swintransformer.h5/Playing_on_water_slide
+  - datasets/custom_dataset/summe_swintransformer.h5/Fire Domino
+  - datasets/custom_dataset/summe_swintransformer.h5/Base jumping
+  - datasets/custom_dataset/summe_swintransformer.h5/Uncut_Evening_Flight
+  - datasets/custom_dataset/summe_swintransformer.h5/Scuba
+  - datasets/custom_dataset/summe_swintransformer.h5/Bike Polo
+  - datasets/custom_dataset/summe_swintransformer.h5/Valparaiso_Downhill
+  - datasets/custom_dataset/summe_swintransformer.h5/Excavators river crossing
+  - datasets/custom_dataset/summe_swintransformer.h5/Jumps
+  - datasets/custom_dataset/summe_swintransformer.h5/Cockpit_Landing
+  - datasets/custom_dataset/summe_swintransformer.h5/Statue of Liberty
+  - datasets/custom_dataset/summe_swintransformer.h5/St Maarten Landing
+  - datasets/custom_dataset/summe_swintransformer.h5/car_over_camera
+  - datasets/custom_dataset/summe_swintransformer.h5/Bearpark_climbing
+  - datasets/custom_dataset/summe_swintransformer.h5/Air_Force_One

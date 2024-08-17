@@ -74,6 +74,7 @@ def main():
                         f'{diversity:.4f}, F-score: {fscore:.4f}')
 
 
+
         logger.info(f'{split_path.stem}: diversity: {stats.diversity:.4f}, '
                     f'F-score: {stats.fscore:.4f}')
         print(f'{split_path.stem}: diversity: {stats.diversity:.4f}, '

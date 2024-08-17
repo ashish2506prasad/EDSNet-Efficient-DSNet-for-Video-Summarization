@@ -3,7 +3,7 @@ import math
 import torch
 from torch import nn
 from transformer.nystroformer import NystromAttention
-from modules.f_net_inspired.fourier_attention import FNet_layer, FastFNetLayer 
+from modules.f_net_inspired.fourier_attention import FNet_layer
 # from mamba_ssm import Mamba
 
 class ScaledDotProductAttention(nn.Module):
@@ -114,7 +114,8 @@ class LSTMExtractor(nn.LSTM):
 
 def build_base_model(base_type: str,
                      num_feature: int,
-                     num_head: int, 
+                     num_head: int,
+                     orientation: str = None
                      ) -> nn.Module:
     if base_type == 'linear':
         base_model = nn.Linear(num_feature, num_feature)
@@ -130,11 +131,7 @@ def build_base_model(base_type: str,
     elif base_type == 'nystromformer':
         base_model = NystromAttention(dim=num_feature, dim_head = 64, heads = num_head, num_landmarks = 64, pinv_iterations = 6,residual = True,residual_conv_kernel = 33)
     elif base_type == 'fourier':
-        base_model = FNet_layer(num_feature, dropout=0.5)
-    elif base_type == 'fast-fourier':
-        base_model = FastFNetLayer(num_feature, dropout = 0.5)
-    # elif base_type =='mamba':
-    #     base_model = Mamba()
+        base_model = FNet_layer(num_feature, dropout=0.5, orientation=orientation)
     else:
         raise ValueError(f'Invalid base model {base_type}')
 
