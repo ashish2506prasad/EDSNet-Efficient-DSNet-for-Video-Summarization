@@ -33,15 +33,15 @@ class VideoDataset(object):
         if 'user_summary' in video_file:
             user_summary = video_file['user_summary'][...].astype(np.float32)
         
-        # if motion feature is available
-        motion_features = None
-        if 'motion_features' in video_file:
-            motion_features = video_file['motion_features'][...].astype(np.float32)
+        # # if motion feature is available
+        # motion_features = None
+        # if 'motion_features' in video_file:
+        #     motion_features = video_file['motion_features'][...].astype(np.float32)
 
         gtscore -= gtscore.min()
         gtscore /= gtscore.max()
 
-        return key, seq, gtscore, cps, n_frames, nfps, picks, motion_features, user_summary
+        return key, seq, gtscore, cps, n_frames, nfps, picks, user_summary
 
     def __len__(self):
         return len(self.keys)
