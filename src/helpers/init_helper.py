@@ -35,7 +35,7 @@ def get_parser() -> argparse.ArgumentParser:
     parser.add_argument('model', type=str,
                         choices=('anchor-based', 'anchor-free'))
     parser.add_argument('--model-depth', type=str, default='shallow',
-                        choices=['shallow', 'deep', 'local-global-attention', 'cross-attention'])
+                        choices=['shallow', 'deep', 'local-global-attention', 'cross-attention', 'original'])
     parser.add_argument('--orientation', type=str, choices=['paper', 'temporal', 'feature_wise'], default='paper')
 
     # training & evaluation
