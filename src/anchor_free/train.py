@@ -3,7 +3,7 @@ import logging
 import torch
 
 from anchor_free import anchor_free_helper
-from anchor_free.dsnet_af import DSNetAF, DSNetAF_DeepAttention
+from anchor_free.dsnet_af import DSNetAF, DSNetAF_DeepAttention, DSNetAF_Multiattention, DSNetAF_Original
 from anchor_free.losses import calc_ctr_loss, calc_cls_loss, calc_loc_loss
 from evaluate import evaluate
 from helpers import data_helper, vsumm_helper
@@ -19,8 +19,13 @@ def train(args, split, save_path):
         model = DSNetAF_DeepAttention(base_model=args.base_model, num_feature=args.num_feature,
                     num_hidden=args.num_hidden, num_head=args.num_head, fc_depth=args.fc_depth, attention_depth=args.attention_depth, orientation=args.orientation)
     elif args.model_depth == 'original':
-        model = DSNetAF(base_model=args.base_model, num_feature=args.num_feature,
+        model = DSNetAF_Original(base_model=args.base_model, num_feature=args.num_feature,
                         num_hidden=args.num_hidden, num_head=args.num_head)
+    elif args.model_depth == 'local-global-attention':
+        model = DSNetAF_Multiattention(base_model=args.base_model, num_feature=args.num_feature,
+                        num_hidden=args.num_hidden, num_head=args.num_head, fc_depth=args.fc_depth, orientation=args.orientation)
+    else:
+        raise ValueError(f'Invalid model type: {args.model_depth}')
         
     model = model.to(args.device)
 

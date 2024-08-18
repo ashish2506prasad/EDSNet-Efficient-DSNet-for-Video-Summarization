@@ -1,7 +1,7 @@
 
-from anchor_based.dsnet import DSNet, DSNet_DeepAttention, DSNet_MultiAttention
+from anchor_based.dsnet import DSNet, DSNet_DeepAttention, DSNet_MultiAttention, DSNet_Original
 from anchor_based.dsnet import DSNetMotionFeatures
-from anchor_free.dsnet_af import DSNetAF, DSNetAF_DeepAttention
+from anchor_free.dsnet_af import DSNetAF, DSNetAF_DeepAttention, DSNetAF_Multiattention, DSNetAF_Original
 from helpers import init_helper
 
 
@@ -17,7 +17,7 @@ def get_anchor_based( base_model, num_feature, num_hidden, anchor_scales,
     elif args.model_depth == 'cross-attention':
         return DSNetMotionFeatures(base_model, num_feature, num_hidden, anchor_scales, num_head, attention_depth, encoder_type)
     elif args.model_depth == 'original':
-        return DSNet(base_model, num_feature, num_hidden, anchor_scales, num_head)
+        return DSNet_Original(base_model, num_feature, num_hidden, anchor_scales, num_head)
     
 
 def get_anchor_free(base_model, num_feature, num_hidden, num_head, fc_depth, orientation, **kwargs):
@@ -27,9 +27,9 @@ def get_anchor_free(base_model, num_feature, num_hidden, num_head, fc_depth, ori
     elif args.model_depth == 'deep':
         return DSNetAF_DeepAttention(base_model, num_feature, num_hidden, num_head, fc_depth, orientation)
     elif args.model_depth == 'original':
-        return DSNetAF(base_model, num_feature, num_hidden, num_head, fc_depth, orientation)
+        return DSNetAF_Original(base_model, num_feature, num_hidden, num_head)
     elif args.model_depth == 'local-global-attention':
-        return DSNet_MultiAttention(base_model, num_feature, num_hidden, num_head)
+        return DSNetAF_Multiattention(base_model, num_feature, num_hidden, num_head, fc_depth, orientation)
 
 
 def get_model(model_type, **kwargs):

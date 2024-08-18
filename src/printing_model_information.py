@@ -7,6 +7,7 @@ from torch import nn
 from helpers import init_helper, data_helper
 from anchor_based import anchor_helper
 from anchor_based.dsnet import DSNet, DSNet_DeepAttention, DSNet_MultiAttention, DSNetMotionFeatures
+from anchor_free.dsnet_af import DSNetAF, DSNetAF_DeepAttention, DSNetAF_Multiattention, DSNetAF_Original
 from torchinfo import summary
 
 from anchor_free.dsnet_af import DSNetAF, DSNetAF_DeepAttention
@@ -69,11 +70,11 @@ def model_summary(model):
                     num_hidden=args.num_hidden, num_head=args.num_head, fc_depth=args.fc_depth, orientation=args.orientation))
         elif args.model_depth == 'original':
             print("printing model summary (original): ")
-            summary(DSNetAF(base_model=args.base_model, num_feature=args.num_feature,
+            summary(DSNetAF_Original(base_model=args.base_model, num_feature=args.num_feature,
                     num_hidden=args.num_hidden, num_head=args.num_head))
         elif args.model_depth == 'local-global-attention':
             print("printing model summary (local-global-attention): ")
-            summary(DSNet_MultiAttention(base_model=args.base_model, num_feature=args.num_feature,
+            summary(DSNetAF_Multiattention(base_model=args.base_model, num_feature=args.num_feature,
                     num_hidden=args.num_hidden, num_head=args.num_head, fc_depth=args.fc_depth, orientation=args.orientation))
         else:
             raise ValueError(f'Invalid model type: {model}')

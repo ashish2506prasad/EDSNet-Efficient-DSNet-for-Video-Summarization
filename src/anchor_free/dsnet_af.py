@@ -153,7 +153,7 @@ class DSNetAF_Multiattention(nn.Module):
     def __init__(self, base_model, num_feature, num_hidden, num_head, fc_depth=5, orientation='paper'):
         super().__init__()
         # self.base_model = build_base_model(base_model, num_feature, num_head)
-        self.multiattention = LocalGlobalEncoder(base_model,  orientation, num_feature, num_head=num_head, num_segments=4, local_attention_head = 2)
+        self.multiattention = LocalGlobalEncoder(base_model, orientation, num_feature, num_head=num_head, num_segments=4, local_attention_head = 2)
 
         self.fc1 = nn.Linear(num_feature, num_hidden)
         self.fc_block = nn.Sequential(nn.Linear(num_hidden, num_hidden),
