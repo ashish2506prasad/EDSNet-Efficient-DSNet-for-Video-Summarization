@@ -52,7 +52,7 @@ class DSNetAF_Original(nn.Module):
 class DSNetAF(nn.Module):
     def __init__(self, base_model, num_feature, num_hidden, num_head, fc_depth=5, orientation='paper'):
         super().__init__()
-        self.base_model = build_base_model(base_model, num_feature, num_head)
+        self.base_model = build_base_model(base_model, num_feature, num_head, orientation)
         self.layer_norm = nn.LayerNorm(num_feature)
 
         self.fc1 = nn.Linear(num_feature, num_hidden)
@@ -101,8 +101,8 @@ class DSNetAF(nn.Module):
 class DSNetAF_DeepAttention(nn.Module):
     def __init__(self, base_model, num_feature, num_hidden, num_head, fc_depth=5, orientation='paper'):
         super().__init__()
-        self.base_model1 = build_base_model(base_model, num_feature, num_head)
-        self.base_model2 = build_base_model(base_model, num_feature, num_head)
+        self.base_model1 = build_base_model(base_model, num_feature, num_head//2, orientation)
+        self.base_model2 = build_base_model(base_model, num_feature, num_head, orientation)
 
         self.layer_norm = nn.LayerNorm(num_feature)
 
@@ -153,7 +153,7 @@ class DSNetAF_Multiattention(nn.Module):
     def __init__(self, base_model, num_feature, num_hidden, num_head, fc_depth=5, orientation='paper'):
         super().__init__()
         # self.base_model = build_base_model(base_model, num_feature, num_head)
-        self.multiattention = LocalGlobalEncoder(num_feature, base_model, num_head)
+        self.multiattention = LocalGlobalEncoder(base_model,  orientation, num_feature, num_head=num_head, num_segments=4, local_attention_head = 2)
 
         self.fc1 = nn.Linear(num_feature, num_hidden)
         self.fc_block = nn.Sequential(nn.Linear(num_hidden, num_hidden),

@@ -141,17 +141,17 @@ class DSNet_DeepAttention(nn.Module):
             nn.LayerNorm(num_hidden))
         self.fc = nn.ModuleList([self.fc_block for i in range(fc_depth)])
 
-        self.attention_block = nn.ModuleList([self.base_model1 for i in range(attention_depth-1)])
+        # self.attention_block = nn.ModuleList([self.base_model1 for i in range(attention_depth-1)])
 
         self.fc_cls = nn.Linear(num_hidden, 1)
         self.fc_loc = nn.Linear(num_hidden, 2)
 
     def forward(self, x):
         _, seq_len, _ = x.shape
-        x = self.base_model2(x)
-        for attention_layer in self.attention_block:
-            out = attention_layer(x)
-            x = x + out
+        x = self.base_model2(x + self.base_model1(x)) + x
+        # for attention_layer in self.attention_block:
+        #     out = attention_layer(x)
+        #     x = x + out
         out = x
 
         out = self.fc1(out)
@@ -190,7 +190,7 @@ class DSNet_MultiAttention(nn.Module):
         self.anchor_scales = anchor_scales
         self.num_scales = len(anchor_scales)
         # self.base_model1 = build_base_model(base_model, num_feature, num_head)
-        self.multiattentionblock = LocalGlobalEncoder(num_feature, base_model, orientation, num_segments=4, num_head=num_head, local_attention_head = 2)
+        self.multiattentionblock = LocalGlobalEncoder(base_model,  orientation, num_feature, num_head=num_head, num_segments=4, local_attention_head = 2)
 
         self.roi_poolings = [nn.AvgPool1d(scale, stride=1, padding=scale // 2)
                              for scale in anchor_scales]
