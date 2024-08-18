@@ -16,12 +16,12 @@ def evaluate(model, val_loader, nms_thresh, device):
     stats = data_helper.AverageMeter('fscore', 'diversity')
 
     with torch.no_grad():
-        for test_key, seq, _, cps, n_frames, nfps, picks, motion_featurs, user_summary in val_loader:
+        for test_key, seq, _, cps, n_frames, nfps, picks, user_summary in val_loader:
             seq_len = len(seq)
             seq_torch = torch.from_numpy(seq).unsqueeze(0).to(device)
-            motion_featurs = torch.from_numpy(motion_featurs).unsqueeze(0).to(device)
+            # motion_featurs = torch.from_numpy(motion_featurs).unsqueeze(0).to(device)
 
-            pred_cls, pred_bboxes = model.predict(seq_torch, motion_featurs)
+            pred_cls, pred_bboxes = model.predict(seq_torch)
 
             pred_bboxes = np.clip(pred_bboxes, 0, seq_len).round().astype(np.int32)
 

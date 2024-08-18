@@ -70,7 +70,7 @@ def train(args, split, save_path):
         model.train()
         stats = data_helper.AverageMeter('loss', 'cls_loss', 'loc_loss')
 
-        for _, seq, gtscore, cps, n_frames, nfps, picks, motion_featurs, _ in train_loader:
+        for _, seq, gtscore, cps, n_frames, nfps, picks, _ in train_loader:
             keyshot_summ = vsumm_helper.get_keyshot_summ(
                 gtscore, cps, n_frames, nfps, picks)
             target = vsumm_helper.downsample_summ(keyshot_summ)
@@ -108,13 +108,13 @@ def train(args, split, save_path):
             
             # load features in the model
             seq = torch.tensor(seq, dtype=torch.float32).unsqueeze(0).to(args.device)
-            if motion_featurs is not None:
-                motion_featurs = torch.tensor(motion_featurs, dtype=torch.float32).unsqueeze(0).to(args.device)
-                pred_cls, pred_loc = model(seq, motion_featurs)
+            # if motion_featurs is not None:
+            #     motion_featurs = torch.tensor(motion_featurs, dtype=torch.float32).unsqueeze(0).to(args.device)
+            #     pred_cls, pred_loc = model(seq, motion_featurs)
                 # print(pred_loc)
 
-            else:
-                pred_cls, pred_loc = model(seq)
+            
+            pred_cls, pred_loc = model(seq)
             
 
             loc_loss = calc_loc_loss(pred_loc, loc_label, cls_label)
@@ -131,7 +131,7 @@ def train(args, split, save_path):
                          loc_loss=loc_loss.item())
         end = time.time()
 
-        val_fscore, _ = evaluate(model, val_loader, args.nms_thresh, args.device)
+        val_fscore, _ =  evaluate(model, val_loader, args.nms_thresh, args.device)
         f1_score.append(val_fscore)
         epoch_list.append(epoch)
 
