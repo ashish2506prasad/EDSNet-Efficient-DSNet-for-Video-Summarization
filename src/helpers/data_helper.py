@@ -54,7 +54,7 @@ class VideoDataset(object):
             return datasets
         elif where == 'local':
             dataset_paths = {str(Path(key).parent) for key in keys}
-            datasets = {path: h5py.File(os.path.join('/mnt/d/Ashish/EE 691/DSNet_Kaggle','/'.join(path.split('/')[:]) ), 'r') for path in dataset_paths}
+            datasets = {path: h5py.File(os.path.join('/mnt/d/Ashish/EE 691/DSNet_Kaggle','/'.join(path.split('/')[1:]) ), 'r') for path in dataset_paths}
             return datasets
 
 class DataLoader(object):

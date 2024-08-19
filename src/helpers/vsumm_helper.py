@@ -81,10 +81,8 @@ def get_keyshot_summ(pred: np.ndarray,
     seg_scores = np.zeros(len(cps), dtype=np.int32)
     for seg_idx, (first, last) in enumerate(cps):
         scores = np.array(frame_scores[first:last + 1])
-        # print(scores)
-        # print(scores.shape)
-        # print(np.unique(scores))
-        # print(np.count_nonzero(scores))
+        # if np.isnan(scores).any():
+        #     print(f'Warning: NaN detected in scores')
         seg_scores[seg_idx] = int(1000 * scores.mean())
 
     # Apply knapsack algorithm to find the best shots

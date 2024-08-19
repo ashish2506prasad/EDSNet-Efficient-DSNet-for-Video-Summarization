@@ -70,9 +70,17 @@ def train(args, split, save_path):
         model.train()
         stats = data_helper.AverageMeter('loss', 'cls_loss', 'loc_loss')
 
+        nan_conversion_errors = 0
+
         for _, seq, gtscore, cps, n_frames, nfps, picks, _ in train_loader:
-            keyshot_summ = vsumm_helper.get_keyshot_summ(
-                gtscore, cps, n_frames, nfps, picks)
+            try:
+                keyshot_summ = vsumm_helper.get_keyshot_summ(gtscore, cps, n_frames, nfps, picks)
+            except ValueError as e:
+                if "cannot convert float NaN to integer" in str(e):
+                    nan_conversion_errors += 1
+                    print(f"NaN conversion error in video {nan_conversion_errors}")
+                continue
+
             target = vsumm_helper.downsample_summ(keyshot_summ)
 
             if not target.any():
@@ -129,6 +137,10 @@ def train(args, split, save_path):
 
             stats.update(loss=loss.item(), cls_loss=cls_loss.item(),
                          loc_loss=loc_loss.item())
+            
+        # Print the total number of videos with this error
+        print(f"Total videos with NaN conversion error: {nan_conversion_errors}")
+
         end = time.time()
 
         val_fscore, _ =  evaluate(model, val_loader, args.nms_thresh, args.device)
