@@ -1,23 +1,53 @@
 import torch
 from torch import nn
-
+import torch.fft as fft
 from anchor_based import anchor_helper
 from helpers import bbox_helper
 from modules.models import build_base_model
 import torch.nn.functional as F
 from modules.encoder import ClassicEncoder, LocalGlobalEncoder
 
+# class fourier_pooling(nn.Module):
+#     def __init__(self, scale):
+#         super().__init__()
+#         self.scale = scale
+
+#     @staticmethod
+#     def padding(x, scale):
+#         pad = int(scale // 2)
+#         if scale % 2 == 0:
+#             return F.pad(x, pad = (0,0,pad-1,pad), value = 0)
+#         else:
+#             return F.pad(x, pad=(0,0,pad,pad), value = 0)
+
+#     def forward(self, x):
+#         print(x.shape)
+#         for scale in self.scale:
+#             padded_feature = self.padding(x, scale)
+#             print(padded_feature.shape, scale)
+#             pool = []
+#             for i in range(x.shape[1]):
+#                 pool.append(fft.fft(x[:, i:i+scale, :], dim=1).real)
+#             print("length of pool", len(pool), pool[0].shape, pool[1].shape)
+#             torch.stack(pool, dim=1)
+#         assert pool.shape[0] == len(self.scale)  
+#         assert pool.shape[1] == x.shape[1]
+#         assert pool.shape[3] == 1024
+#         return pool 
+    
+           
+
 class DSNet_Original(nn.Module):
     def __init__(self, base_model, num_feature, num_hidden, anchor_scales,
                  num_head):
         super().__init__()
+        assert base_model == 'attention'
         self.anchor_scales = anchor_scales
         self.num_scales = len(anchor_scales)
         self.base_model = build_base_model(base_model, num_feature, num_head)
 
         self.roi_poolings = [nn.AvgPool1d(scale, stride=1, padding=scale // 2)
                              for scale in anchor_scales]
-
         self.layer_norm = nn.LayerNorm(num_feature)
         self.fc1 = nn.Sequential(
             nn.Linear(num_feature, num_hidden),
@@ -32,13 +62,11 @@ class DSNet_Original(nn.Module):
         _, seq_len, _ = x.shape
         out = self.base_model(x)
         out = out + x
-        out = self.layer_norm(out)
-
-        out = out.transpose(2, 1)
-        pool_results = [roi_pooling(out) for roi_pooling in self.roi_poolings]
-        out = torch.cat(pool_results, dim=0).permute(2, 0, 1)[:-1]
-
-        out = self.fc1(out)
+        out = self.layer_norm(out)  # (batch, seq_len, num_feature)
+        out = out.transpose(2, 1)  # (batch, num_feature, seq_len)
+        pool_results = [roi_pooling(out) for roi_pooling in self.roi_poolings]  # [(batch, num_feature, 1)] * num_scales
+        out = torch.cat(pool_results, dim=0).permute(2, 0, 1)[:-1]   # (seq_len, num_scales, num_feature)
+        out = self.fc1(out)  # (seq_len, num_scales, num_hidden)
 
         pred_cls = self.fc_cls(out).sigmoid().view(seq_len, self.num_scales)
         pred_loc = self.fc_loc(out).view(seq_len, self.num_scales, 2)
@@ -71,6 +99,8 @@ class DSNet(nn.Module):
         self.roi_poolings = [nn.AvgPool1d(scale, stride=1, padding=scale // 2)
                              for scale in anchor_scales]
 
+        # self.fourier_pooling = fourier_pooling(scale=[4])
+
         self.layer_norm = nn.LayerNorm(num_feature)
         self.fc1 = nn.Linear(num_feature, num_hidden)
         self.fc_block = nn.Sequential(nn.Linear(num_hidden, num_hidden),
@@ -79,16 +109,12 @@ class DSNet(nn.Module):
             nn.LayerNorm(num_hidden)
             )
         self.fc = nn.ModuleList([self.fc_block for i in range(fc_depth)])
-        
         self.fc_cls = nn.Linear(num_hidden, 1)
         self.fc_loc = nn.Linear(num_hidden, 2)
 
     def forward(self, x):
         _, seq_len, _ = x.shape
-        if self.base_model == 'fourier' or self.base_model == 'fast-fourier':
-            out, _ = self.base_model(x)
-        else:
-            out = self.base_model(x)
+        out = self.base_model(x)
         out = out + x
         out = self.fc1(self.layer_norm(out))
         for fc in self.fc:
@@ -97,6 +123,9 @@ class DSNet(nn.Module):
         out = out.transpose(2, 1)
         pool_results = [roi_pooling(out) for roi_pooling in self.roi_poolings]
         out = torch.cat(pool_results, dim=0).permute(2, 0, 1)[:-1]
+
+        # out = self.fourier_pooling(out)
+        # print(out.shape)
 
         pred_cls = self.fc_cls(out).sigmoid().view(seq_len, self.num_scales)
         pred_loc = self.fc_loc(out).view(seq_len, self.num_scales, 2)

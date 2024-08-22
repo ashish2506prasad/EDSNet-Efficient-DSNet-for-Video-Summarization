@@ -5,7 +5,7 @@ import torch
 from torch import nn
 
 from anchor_based import anchor_helper
-from anchor_based.dsnet import DSNet, DSNet_DeepAttention, DSNet_MultiAttention, DSNetMotionFeatures
+from anchor_based.dsnet import DSNet, DSNet_DeepAttention, DSNet_MultiAttention, DSNetMotionFeatures, DSNet_Original
 from anchor_based.losses import calc_cls_loss, calc_loc_loss
 from evaluate import evaluate
 from helpers import data_helper, vsumm_helper, bbox_helper
@@ -39,7 +39,7 @@ def train(args, split, save_path):
                     num_hidden=args.num_hidden, anchor_scales=args.anchor_scales,
                     num_head=args.num_head, fc_depth=args.fc_depth, orientation=args.orientation)
     elif args.model_depth == 'original':
-        model = DSNet(base_model=args.base_model, num_feature=args.num_feature,
+        model = DSNet_Original(base_model=args.base_model, num_feature=args.num_feature,
                     num_hidden=args.num_hidden, anchor_scales=args.anchor_scales,
                     num_head=args.num_head)
     elif args.model_depth == 'cross-attention':
@@ -78,7 +78,7 @@ def train(args, split, save_path):
             except ValueError as e:
                 if "cannot convert float NaN to integer" in str(e):
                     nan_conversion_errors += 1
-                    print(f"NaN conversion error in video {nan_conversion_errors}")
+                    # print(f"NaN conversion error in video {nan_conversion_errors}")
                 continue
 
             target = vsumm_helper.downsample_summ(keyshot_summ)

@@ -1,5 +1,5 @@
 from torch import nn
-
+import torch.fft as fft
 from anchor_free import anchor_free_helper
 from modules.models import build_base_model
 from modules.encoder import MultiAttention, LocalGlobalEncoder
@@ -8,15 +8,15 @@ class DSNetAF_Original(nn.Module):
     def __init__(self, base_model, num_feature, num_hidden, num_head):
         super().__init__()
         self.base_model = build_base_model(base_model, num_feature, num_head)
-        self.layer_norm = nn.LayerNorm(num_feature)
+        self.layer_norm = nn.LayerNorm(num_feature)  # (batch, seq_len, num_feature)
 
         self.fc1 = nn.Sequential(
             nn.Linear(num_feature, num_hidden),
             nn.ReLU(inplace=True),
             nn.Dropout(0.5),
             nn.LayerNorm(num_hidden)
-        )
-        self.fc_cls = nn.Linear(num_hidden, 1)
+        )   # (batch, seq_len, num_hidden)
+        self.fc_cls = nn.Linear(num_hidden, 1)  # (batch, seq_len, 1)
         self.fc_loc = nn.Linear(num_hidden, 2)
         self.fc_ctr = nn.Linear(num_hidden, 1)
 
@@ -26,7 +26,6 @@ class DSNetAF_Original(nn.Module):
 
         out = out + x
         out = self.layer_norm(out)
-
         out = self.fc1(out)
 
         pred_cls = self.fc_cls(out).sigmoid().view(seq_len)
