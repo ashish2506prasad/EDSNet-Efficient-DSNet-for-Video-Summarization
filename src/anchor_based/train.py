@@ -139,7 +139,7 @@ def train(args, split, save_path):
                          loc_loss=loc_loss.item())
             
         # Print the total number of videos with this error
-        print(f"Total videos with NaN conversion error: {nan_conversion_errors}")
+        # print(f"Total videos with NaN conversion error: {nan_conversion_errors}")
 
         end = time.time()
 
