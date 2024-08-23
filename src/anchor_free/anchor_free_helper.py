@@ -28,7 +28,7 @@ def get_ctr_label(target: np.ndarray,
     :param eps: Small floating value to prevent division by zero.
     :return: Centerness label. Sized [N].
     """
-    target = np.asarray(target, dtype=np.bool)
+    target = np.asarray(target, dtype=np.bool_)
     ctr_label = np.zeros(target.shape, dtype=np.float32)
 
     offset_left, offset_right = offset[target, 0], offset[target, 1]

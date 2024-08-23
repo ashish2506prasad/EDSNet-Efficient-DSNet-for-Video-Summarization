@@ -6,37 +6,71 @@ from helpers import bbox_helper
 from modules.models import build_base_model
 import torch.nn.functional as F
 from modules.encoder import ClassicEncoder, LocalGlobalEncoder
+import numpy as np
+import pywt
 
-# class fourier_pooling(nn.Module):
-#     def __init__(self, scale):
-#         super().__init__()
-#         self.scale = scale
+class Pooling(nn.Module):
+    def __init__(self, scale):
+        super().__init__()
+        self.scale = scale
+        assert scale in [[4, 8], [4], [8]], "anchor scale must be [4, 8], [4], or [8]"
 
-#     @staticmethod
-#     def padding(x, scale):
-#         pad = int(scale // 2)
-#         if scale % 2 == 0:
-#             return F.pad(x, pad = (0,0,pad-1,pad), value = 0)
-#         else:
-#             return F.pad(x, pad=(0,0,pad,pad), value = 0)
+    @staticmethod
+    def dwt(x, scale):
+        assert scale == 8
+        pooled = []
+        coarse_pooling = []
+        for i in range(x.shape[1]):
+            end = min(i + scale//2, x.shape[1])
+            start = max(0, i - scale//2 + 1)
+            segment = x[:, start:end+1, :]
+            if segment.shape[1] < scale:
+                segment = F.pad(segment, (0, 0, 0, scale - segment.shape[1]))
+            coeffs, _ = pywt.dwt(segment.cpu().numpy(), 'db1', axis = 1)
+            coeffs = torch.from_numpy(coeffs).to(x.device)
+            pooled.append(coeffs)
+            coarse_pooling.append(coeffs.mean(dim=1))
+        
+        fine_pooling = torch.stack(pooled, dim=1).view(1, x.shape[1],4 * x.shape[2]).to(x.device)
+        coarse_pooling = torch.stack(coarse_pooling, dim=1).to(x.device)
+        return coarse_pooling, fine_pooling
 
-#     def forward(self, x):
-#         print(x.shape)
-#         for scale in self.scale:
-#             padded_feature = self.padding(x, scale)
-#             print(padded_feature.shape, scale)
-#             pool = []
-#             for i in range(x.shape[1]):
-#                 pool.append(fft.fft(x[:, i:i+scale, :], dim=1).real)
-#             print("length of pool", len(pool), pool[0].shape, pool[1].shape)
-#             torch.stack(pool, dim=1)
-#         assert pool.shape[0] == len(self.scale)  
-#         assert pool.shape[1] == x.shape[1]
-#         assert pool.shape[3] == 1024
-#         return pool 
+    @staticmethod
+    def fft(x, scale):
+        assert scale == 4
+        pooled = []
+        coarse_pooling = []
+        for i in range(x.shape[1]):
+            end = min(i + scale//2, x.shape[1])
+            start = max(0, i - scale//2 + 1)
+            segment = x[:, start:end+1, :]
+            if segment.shape[1] < scale:
+                segment = F.pad(segment, (0, 0, 0, scale - segment.shape[1]))
+            segment_fft = fft.fft(segment, dim=1).real  # (1, 4, num_hidden)
+            coarse_pooling.append(segment_fft.mean(dim=1))  # (1, 1, num_hidden)
+            pooled.append(segment_fft)
+        
+        coarse_pooling = torch.stack(coarse_pooling, dim=1).to(x.device)
+        fine_pooling = torch.stack(pooled, dim=1).view(1, x.shape[1], scale * x.shape[2]).to(x.device)
+        return coarse_pooling, fine_pooling
+
+    def forward(self, x):
+        if self.scale == [4, 8]:
+            coarse_fft_pooling, fine_fft_pooling = self.fft(x, 4)  # (seq_len, seg_len, num_hidden)
+            coarse_dwt_pooling, fine_dwt_pooling = self.dwt(x, 8)  # (seq_len, seg_len//2, num_hidden)
+            print(coarse_dwt_pooling.shape, fine_dwt_pooling.shape, coarse_fft_pooling.shape, fine_fft_pooling.shape)
+            return coarse_fft_pooling, fine_fft_pooling, coarse_dwt_pooling, fine_dwt_pooling        
+
+        elif self.scale == [4]:
+            coarse_fft_pooling, fine_fft_pooling = self.fft(x, 4)
+            print(coarse_fft_pooling.shape, fine_fft_pooling.shape)
+            return coarse_fft_pooling, fine_fft_pooling
+        
+        elif self.scale == [8]:
+            coarse_dwt_pooling, fine_dwt_pooling = self.dwt(x, 8)
+            print(coarse_dwt_pooling.shape, fine_dwt_pooling.shape)
+            return coarse_dwt_pooling, fine_dwt_pooling
     
-           
-
 class DSNet_Original(nn.Module):
     def __init__(self, base_model, num_feature, num_hidden, anchor_scales,
                  num_head):
@@ -90,7 +124,7 @@ class DSNet_Original(nn.Module):
 
 class DSNet(nn.Module):
     def __init__(self, base_model, num_feature, num_hidden, anchor_scales,
-                 num_head, fc_depth=5, orientation='paper'):
+                 num_head, fc_depth=5, orientation='paper', pooling = 'fft'):
         super().__init__()
         self.anchor_scales = anchor_scales
         self.num_scales = len(anchor_scales)
@@ -98,8 +132,10 @@ class DSNet(nn.Module):
 
         self.roi_poolings = [nn.AvgPool1d(scale, stride=1, padding=scale // 2)
                              for scale in anchor_scales]
-
-        # self.fourier_pooling = fourier_pooling(scale=[4])
+        if pooling == 'fft':
+            self.pooling = Pooling(scale=[4]) 
+        elif pooling == 'dwt':
+            self.pooling = Pooling(scale=[8])
 
         self.layer_norm = nn.LayerNorm(num_feature)
         self.fc1 = nn.Linear(num_feature, num_hidden)
