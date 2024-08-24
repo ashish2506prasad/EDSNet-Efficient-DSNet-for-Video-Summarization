@@ -7,6 +7,7 @@ from anchor_free.dsnet_af import DSNetAF, DSNetAF_DeepAttention, DSNetAF_Multiat
 from anchor_free.losses import calc_ctr_loss, calc_cls_loss, calc_loc_loss
 from evaluate import evaluate
 from helpers import data_helper, vsumm_helper
+import time
 
 logger = logging.getLogger()
 
@@ -50,7 +51,7 @@ def train(args, split, save_path):
         model.train()
         stats = data_helper.AverageMeter('loss', 'cls_loss', 'loc_loss',
                                          'ctr_loss')
-
+        start = time.time()
         for _, seq, gtscore, change_points, n_frames, nfps, picks, _ in train_loader:
             keyshot_summ = vsumm_helper.get_keyshot_summ(
                 gtscore, change_points, n_frames, nfps, picks)
@@ -81,6 +82,7 @@ def train(args, split, save_path):
             optimizer.zero_grad()
             loss.backward()
             optimizer.step()
+            end = time.time()
 
             stats.update(loss=loss.item(), cls_loss=cls_loss.item(),
                          loc_loss=loc_loss.item(), ctr_loss=ctr_loss.item())
@@ -98,11 +100,13 @@ def train(args, split, save_path):
             if args.where == 'local':
                 logger.info(f'Epoch: {epoch}/{args.max_epoch} '
                             f'Loss: {stats.cls_loss:.4f}/{stats.loc_loss:.4f}/{stats.loss:.4f} '
-                            f'F-score cur/max: {val_fscore:.4f}/{max_val_fscore:.4f}')
+                            f'F-score cur/max: {val_fscore:.4f}/{max_val_fscore:.4f}'
+                            f'Time: {end-start:.4f}')
             else:
                 print(f'Epoch: {epoch}/{args.max_epoch} '
                             f'Loss: {stats.cls_loss:.4f}/{stats.loc_loss:.4f}/{stats.loss:.4f} '
-                            f'F-score cur/max: {val_fscore:.4f}/{max_val_fscore:.4f}')
+                            f'F-score cur/max: {val_fscore:.4f}/{max_val_fscore:.4f}'
+                            f'Time: {end-start:.4f}')
 
 
     return max_val_fscore, f1_score, epoch_list
