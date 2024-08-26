@@ -7,7 +7,7 @@ from modules.models import build_base_model
 import torch.nn.functional as F
 from modules.encoder import ClassicEncoder, LocalGlobalEncoder
 import numpy as np
-from poolings import Pooling
+from anchor_based.poolings import Pooling
     
 class DSNet_Original(nn.Module):
     def __init__(self, base_model, num_feature, num_hidden, anchor_scales,
