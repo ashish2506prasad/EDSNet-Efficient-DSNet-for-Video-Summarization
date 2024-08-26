@@ -6,10 +6,10 @@ from helpers import init_helper
 
 
 def get_anchor_based( base_model, num_feature, num_hidden, anchor_scales,
-                     num_head, fc_depth, attention_depth, encoder_type, orientation,**kwargs):
+                     num_head, fc_depth, attention_depth, encoder_type, orientation, pooling_type, **kwargs):
     args = init_helper.get_arguments()
     if args.model_depth == 'shallow':
-        return DSNet(base_model, num_feature, num_hidden, anchor_scales, num_head, fc_depth, orientation)
+        return DSNet(base_model, num_feature, num_hidden, anchor_scales, num_head, fc_depth, orientation, pooling_type)
     elif args.model_depth == 'deep':
         return DSNet_DeepAttention(base_model, num_feature, num_hidden, anchor_scales, num_head, fc_depth, attention_depth, orientation)
     elif args.model_depth == 'local-global-attention':

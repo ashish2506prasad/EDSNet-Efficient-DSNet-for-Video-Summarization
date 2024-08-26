@@ -33,7 +33,7 @@ def model_summary(model):
             print("printing model summary (shallow): ")
             summary(DSNet(base_model=args.base_model, num_feature=args.num_feature,
                     num_hidden=args.num_hidden, anchor_scales=args.anchor_scales,
-                    num_head=args.num_head, fc_depth=args.fc_depth, orientation=args.orientation))
+                    num_head=args.num_head, fc_depth=args.fc_depth, orientation=args.orientation, pooling_type=args.pooling_type))
         elif args.model_depth == 'deep':
             print("printing model summary (deep attention): ")
             summary(DSNet_DeepAttention(base_model=args.base_model, num_feature=args.num_feature,
