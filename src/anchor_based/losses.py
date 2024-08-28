@@ -21,11 +21,6 @@ def calc_loc_loss(pred_loc: torch.Tensor,
     pred_loc = pred_loc[pos_idx]
     test_loc = test_loc[pos_idx]
 
-    # print(test_loc)
-
-    # print(pred_loc.shape, test_loc.shape)
-    # print(pred_loc, test_loc)
-
     if use_smooth:
         loc_loss = F.smooth_l1_loss(pred_loc, test_loc)
     else:
