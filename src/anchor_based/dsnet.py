@@ -95,6 +95,7 @@ class DSNet(nn.Module):
         self.fc_loc = nn.Linear(num_hidden, 2)
 
     def forward(self, x):
+        print(x.shape)
         _, seq_len, _ = x.shape
         out = self.base_model(x)
         out = out + x
@@ -106,6 +107,7 @@ class DSNet(nn.Module):
             out = out.transpose(2, 1)
             pool_results = [roi_pooling(out) for roi_pooling in self.poolings]
             out = torch.cat(pool_results, dim=0).permute(2, 0, 1)[:-1]
+            # print(out.shape)
             pred_cls = self.fc_cls(out).sigmoid().view(seq_len, self.num_scales)
             pred_loc = self.fc_loc(out).view(seq_len, self.num_scales, 2)
 
@@ -113,13 +115,15 @@ class DSNet(nn.Module):
             assert self.anchor_scales == [4], "FFT pooling is only supported for anchor scale 4"
             coarse_pooling, fine_pooling = self.poolings[0](out)
             fine_pooling = self.fc_pooling(fine_pooling)
+            print("fine_pooling", fine_pooling.shape, "coarse_pooling", coarse_pooling.shape)
             pred_cls = self.fc_cls(coarse_pooling).sigmoid().view(seq_len, self.num_scales)
             pred_loc = self.fc_loc(fine_pooling).view(seq_len, self.num_scales, 2)
 
         elif self.pooling_type == 'dwt':
-            assert self.anchor_scales == [8], " DWT pooling is only supported for anchor scale 8"
+            assert self.anchor_scales == [8], "DWT pooling is only supported for anchor scale 8"
             coarse_pooling, fine_pooling = self.poolings[0](out)
             fine_pooling = self.fc_pooling(fine_pooling)
+            print("fine_pooling", fine_pooling.shape, "coarse_pooling", coarse_pooling.shape)
             pred_cls = self.fc_cls(coarse_pooling).sigmoid().view(seq_len, self.num_scales)
             pred_loc = self.fc_loc(fine_pooling).view(seq_len, self.num_scales, 2)
 
@@ -129,14 +133,15 @@ class DSNet(nn.Module):
             coarse_pooling = [roi_pooling(coarse_pooling) for roi_pooling in self.roi_poolings]
             coarse_pooling = torch.cat(coarse_pooling, dim=0).permute(2, 0, 1)[:-1]
 
-            pooling = self.poolings[0](out)
-            pooling = self.fc_pooling(pooling)
+            fine_pooling = self.poolings[0](out)
+            fine_pooling = self.fc_pooling(fine_pooling).view(seq_len, self.num_scales, -1)
+            print("fine_pooling", fine_pooling.shape, "coarse_pooling", coarse_pooling.shape)
             pred_cls = self.fc_cls(coarse_pooling).sigmoid().view(seq_len, self.num_scales)
-            pred_loc = self.fc_loc(pooling).view(seq_len, self.num_scales, 2)
+            pred_loc = self.fc_loc(fine_pooling).view(seq_len, self.num_scales, 2)
 
         # pred_cls = self.fc_cls(out).sigmoid().view(seq_len, self.num_scales)
         # pred_loc = self.fc_loc(out).view(seq_len, self.num_scales, 2)
-
+        # print("pred_cls", pred_cls.shape, "pred_loc", pred_loc.shape)
         return pred_cls, pred_loc
 
     def predict(self, seq):

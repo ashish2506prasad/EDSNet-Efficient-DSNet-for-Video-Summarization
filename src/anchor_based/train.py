@@ -63,7 +63,8 @@ def train(args, split, save_path):
     val_loader = data_helper.DataLoader(val_set, shuffle=False)
 
     epoch_list = []
-    f1_score = []
+    f1_score_list = []
+    loss_list = []
 
     for epoch in range(args.max_epoch):
         start = time.time()
@@ -90,23 +91,17 @@ def train(args, split, save_path):
             target_bboxes = bbox_helper.lr2cw(target_bboxes)
             anchors = anchor_helper.get_anchors(target.size, args.anchor_scales)
             # Get class and location label for positive samples
-            cls_label, loc_label = anchor_helper.get_pos_label(
-                anchors, target_bboxes, args.pos_iou_thresh)
+            cls_label, loc_label = anchor_helper.get_pos_label(anchors, target_bboxes, args.pos_iou_thresh)
 
             # Get negative samples
             num_pos = cls_label.sum()
-            cls_label_neg, _ = anchor_helper.get_pos_label(
-                anchors, target_bboxes, args.neg_iou_thresh)
-            cls_label_neg = anchor_helper.get_neg_label(
-                cls_label_neg, int(args.neg_sample_ratio * num_pos))
+            cls_label_neg, _ = anchor_helper.get_pos_label(anchors, target_bboxes, args.neg_iou_thresh)
+            cls_label_neg = anchor_helper.get_neg_label(cls_label_neg, int(args.neg_sample_ratio * num_pos))
 
             # Get incomplete samples
-            cls_label_incomplete, _ = anchor_helper.get_pos_label(
-                anchors, target_bboxes, args.incomplete_iou_thresh)
+            cls_label_incomplete, _ = anchor_helper.get_pos_label(anchors, target_bboxes, args.incomplete_iou_thresh)
             cls_label_incomplete[cls_label_neg != 1] = 1
-            cls_label_incomplete = anchor_helper.get_neg_label(
-                cls_label_incomplete,
-                int(args.incomplete_sample_ratio * num_pos))
+            cls_label_incomplete = anchor_helper.get_neg_label(cls_label_incomplete, int(args.incomplete_sample_ratio * num_pos))
 
             cls_label[cls_label_neg == -1] = -1
             cls_label[cls_label_incomplete == -1] = -1
@@ -116,27 +111,23 @@ def train(args, split, save_path):
             
             # load features in the model
             seq = torch.tensor(seq, dtype=torch.float32).unsqueeze(0).to(args.device)
-            # if motion_featurs is not None:
-            #     motion_featurs = torch.tensor(motion_featurs, dtype=torch.float32).unsqueeze(0).to(args.device)
-            #     pred_cls, pred_loc = model(seq, motion_featurs)
-                # print(pred_loc)
-
             
             pred_cls, pred_loc = model(seq)
             
 
             loc_loss = calc_loc_loss(pred_loc, loc_label, cls_label)
             cls_loss = calc_cls_loss(pred_cls, cls_label)
+            # print("cls_loss: ", cls_loss.item(), "\tloc_loss: ", loc_loss.item())
 
             loss = cls_loss + args.lambda_reg * loc_loss
+            # print(loss.item())
 
             optimizer.zero_grad()
             loss.backward()
             optimizer.step()
 
 
-            stats.update(loss=loss.item(), cls_loss=cls_loss.item(),
-                         loc_loss=loc_loss.item())
+            stats.update(loss=loss.item(), cls_loss=cls_loss.item(), loc_loss=loc_loss.item())
             
         # Print the total number of videos with this error
         # print(f"Total videos with NaN conversion error: {nan_conversion_errors}")
@@ -144,7 +135,7 @@ def train(args, split, save_path):
         end = time.time()
 
         val_fscore, _ =  evaluate(model, val_loader, args.nms_thresh, args.device)
-        f1_score.append(val_fscore)
+        f1_score_list.append(val_fscore)
         epoch_list.append(epoch)
 
         if max_val_fscore < val_fscore:
@@ -162,5 +153,9 @@ def train(args, split, save_path):
                             f'Loss: {stats.cls_loss:.4f}/{stats.loc_loss:.4f}/{stats.loss:.4f} '
                             f'F-score cur/max: {val_fscore:.4f}/{max_val_fscore:.4f}'
                             f'Time: {end-start:.4f}')
+    
+                
+    plt.plot(epoch_list, f1_score_list)
+    plt.show()
 
-    return max_val_fscore, f1_score, epoch_list
+    return max_val_fscore, f1_score_list, epoch_list
