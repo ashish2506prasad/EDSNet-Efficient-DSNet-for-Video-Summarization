@@ -157,11 +157,17 @@ class DSNet_DeepAttention(nn.Module):
         super().__init__()
         self.anchor_scales = anchor_scales
         self.num_scales = len(anchor_scales)
-        self.base_model1 = build_base_model(base_type=base_model, num_feature=num_feature, num_head=num_head//2, orientation=orientation)
+        self.base_model1 = build_base_model(base_type=base_model, num_feature=num_feature, num_head=num_head, orientation=orientation)
         self.base_model2 = build_base_model(base_model, num_feature, num_head, orientation)
 
-        self.roi_poolings = [nn.AvgPool1d(scale, stride=1, padding=scale // 2)
-                             for scale in anchor_scales]
+        # self.pooling_type = pooling_type
+
+        # if pooling_type == 'roi':
+        #     self.poolings = [nn.AvgPool1d(scale, stride=1, padding=scale//2)
+        #                         for scale in anchor_scales]
+        # else:
+        #     self.poolings = Pooling(anchor_scales, pooling_type)
+        #     self.fc_pooling = nn.Sequential(nn.Linear(num_hidden*4 , num_hidden), nn.ReLU())
 
         self.layer_norm = nn.LayerNorm(num_feature)
 
@@ -180,10 +186,11 @@ class DSNet_DeepAttention(nn.Module):
 
     def forward(self, x):
         _, seq_len, _ = x.shape
-        x = self.base_model2(x + self.base_model1(x)) + x
-        for attention_layer in self.attention_block:
+        x = x + self.base_model1(x)
+        for i, attention_layer in enumerate(self.attention_block):
             out = attention_layer(x)
-            x = x + out
+            if i%2 == 0:
+                x = x + out
         out = x
 
         out = self.fc1(out)
