@@ -8,13 +8,15 @@ class FFTCalculation(nn.Module):
 
     def forward(self, features):
         if self.orientation == 'temporal':
-            temporal_fft = torch.fft.fft(features, dim=-2).real
-            return temporal_fft
+            temporal_fft = torch.fft.fft(features.permute(0, 2, 1), dim=-1).real
+            return temporal_fft.permute(0, 2, 1)
+
         elif self.orientation == 'feature_wise':
             feature_wise_fft = torch.fft.fft(features, dim=-1).real
             return feature_wise_fft
+        
         elif self.orientation == 'paper':
-            fft_features_paper = torch.fft.fft(torch.fft.fft(features, dim=-1), dim=-2).real
+            fft_features_paper = torch.fft.fft(torch.fft.fft(features, dim=-1).permute(0, 2, 1), dim=-1).permute(0, 2, 1).real
             return fft_features_paper
 
 
