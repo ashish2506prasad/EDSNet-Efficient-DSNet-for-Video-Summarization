@@ -169,6 +169,9 @@ class DSNet_DeepAttention(nn.Module):
         #     self.poolings = Pooling(anchor_scales, pooling_type)
         #     self.fc_pooling = nn.Sequential(nn.Linear(num_hidden*4 , num_hidden), nn.ReLU())
 
+        self.roi_poolings = [nn.AvgPool1d(scale, stride=1, padding=scale // 2)
+                             for scale in anchor_scales]
+
         self.layer_norm = nn.LayerNorm(num_feature)
 
         self.fc1 = nn.Linear(num_feature, num_hidden)
