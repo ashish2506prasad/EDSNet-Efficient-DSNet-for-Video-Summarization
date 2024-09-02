@@ -12,9 +12,14 @@ class Pooling(nn.Module):
         self.pooling_type = pooling_type
         self.fc_list = nn.ModuleList([])
         for scale in self.scale:
-            self.fc_list.append(nn.Linear(scale, 4, bias=False))
+            if pooling_type != 'dwt':
+                self.fc_list.append(nn.Linear(scale, 4, bias=False))
+            else:
+                self.fc_list.append(nn.Linear(scale//2, 4, bias=False))
+
 
     def dwt(self, x):
+        assert self.scale[0] == 8
         poolings_list = []
         for i, scale in enumerate(self.scale):
             segments_list = []
@@ -59,6 +64,7 @@ class Pooling(nn.Module):
     
     def fft(self, x):
         poolings_list = []
+        assert self.scale[0] == 4
         for i, scale in enumerate(self.scale):
             segments_list = []
             for j in range(x.shape[1]):
@@ -68,9 +74,9 @@ class Pooling(nn.Module):
                 if segment.shape[1] < scale:
                     segment = F.pad(segment, (0, 0, 0, scale - segment.shape[1]))
 
-                segments_list.append(fft(segment.permute(0, 2, 1), dim = -1).real) # (1, num_hidden, scale)
+                # segments_list.append(fft(segment.permute(0, 2, 1), dim = -1).real) # (1, num_hidden, scale)
 
-            segment_tensor = torch.cat(segments_list, dim=0).to(x.device)  # (seq_len, num_hidden, scale)
+            segment_tensor = torch.cat(segments_list, dim=0).permute(0, 2, 1).to(x.device)  # (seq_len, num_hidden, scale)
             segment_tensor = self.fc_list[i](segment_tensor)
             segment_tensor = fft.fft(segment_tensor, dim=-1).real
             segment_tensor = segment_tensor.permute(0, 2, 1)
