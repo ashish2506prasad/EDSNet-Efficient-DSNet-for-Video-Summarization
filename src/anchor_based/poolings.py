@@ -68,9 +68,9 @@ class Pooling(nn.Module):
                 if segment.shape[1] < scale:
                     segment = F.pad(segment, (0, 0, 0, scale - segment.shape[1]))
 
-                segments_list.append(segment)
+                segments_list.append(fft(segment.permute(0, 2, 1), dim = -1).real) # (1, num_hidden, scale)
 
-            segment_tensor = torch.cat(segments_list, dim=0).permute(0, 2, 1).to(x.device)  # (seq_len, num_hidden, scale)
+            segment_tensor = torch.cat(segments_list, dim=0).to(x.device)  # (seq_len, num_hidden, scale)
             segment_tensor = self.fc_list[i](segment_tensor)
             segment_tensor = fft.fft(segment_tensor, dim=-1).real
             segment_tensor = segment_tensor.permute(0, 2, 1)
