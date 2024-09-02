@@ -30,7 +30,7 @@ class Pooling(nn.Module):
                 segments_list.append(coeffs)
 
             segment_tensor = torch.cat(segments_list, dim=0).permute(0, 2, 1).to(x.device)
-            segment_tensor = self.fc_list[i-1](segment_tensor)  # Correct index here
+            segment_tensor = self.fc_list[i](segment_tensor)  # Correct index here
             segment_tensor = segment_tensor.permute(0, 2, 1)
 
             poolings_list.append(segment_tensor)
@@ -71,7 +71,7 @@ class Pooling(nn.Module):
                 segments_list.append(segment)
 
             segment_tensor = torch.cat(segments_list, dim=0).permute(0, 2, 1).to(x.device)  # (seq_len, num_hidden, scale)
-            segment_tensor = self.fc_list[i-1](segment_tensor)
+            segment_tensor = self.fc_list[i](segment_tensor)
             segment_tensor = fft.fft(segment_tensor, dim=-1).real
             segment_tensor = segment_tensor.permute(0, 2, 1)
 
