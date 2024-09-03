@@ -43,6 +43,7 @@ class Pooling(nn.Module):
         return poolings_list  # Only one list is returned
 
     def flat_pooling(self, x):
+        assert self.scale[0] == 4
         poolings_list = []
         for i, scale in enumerate(self.scale):
             segments_list = []
@@ -56,7 +57,7 @@ class Pooling(nn.Module):
                 segments_list.append(segment)
     
             segment_tensor = torch.cat(segments_list, dim=0).permute(0, 2, 1).to(x.device)  # (seq_len, num_hidden, scale)
-            segment_tensor = self.fc_list[i](segment_tensor)  # Correct index
+            segment_tensor = self.fc_list[i](segment_tensor)  
             segment_tensor = segment_tensor.permute(0, 2, 1)  # (seq_len, scale, num_hidden)
 
             poolings_list.append(segment_tensor)
@@ -74,11 +75,10 @@ class Pooling(nn.Module):
                 if segment.shape[1] < scale:
                     segment = F.pad(segment, (0, 0, 0, scale - segment.shape[1]))
 
-                segments_list.append(segment) # (1, num_hidden, scale)
+                segments_list.append(fft.fft(segment.permute(0, 2, 1), dim = -1).real) # (1, num_hidden, scale)
 
-            segment_tensor = torch.cat(segments_list, dim=0).permute(0, 2, 1).to(x.device)  # (seq_len, num_hidden, scale)
+            segment_tensor = torch.cat(segments_list, dim=0).to(x.device)  # (seq_len, num_hidden, scale)
             segment_tensor = self.fc_list[i](segment_tensor)
-            segment_tensor = fft.fft(segment_tensor, dim=-1).real
             segment_tensor = segment_tensor.permute(0, 2, 1)
 
             poolings_list.append(segment_tensor)
