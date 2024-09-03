@@ -44,8 +44,7 @@ class Pooling(nn.Module):
         poolings_list = []
         for i, scale in enumerate(self.scale):
             segments_list = self.segment_and_pad(x, scale)
-            normalized_segments = [F.normalize(segment, dim=-1) for segment in segments_list]
-            segment_tensor = torch.cat(normalized_segments, dim=0).permute(0, 2, 1).to(x.device)
+            segment_tensor = torch.cat(segments_list, dim=0).permute(0, 2, 1).to(x.device)
             segment_tensor = self.fc_list[i](segment_tensor).permute(0, 2, 1)
             poolings_list.append(segment_tensor)
         return poolings_list

@@ -200,40 +200,11 @@ class DSNet_DeepAttention(nn.Module):
         for fc in self.fc:
             out = fc(out)
 
-        if self.pooling_type == 'roi':
-            out = out.transpose(2, 1)  # (1, num_hidden, seq_len)
-            pool_results = [roi_pooling(out) for roi_pooling in self.poolings]  # [torch.tensor(1, num_hidden, seq_len), ...]
-            out = torch.cat(pool_results, dim=0).permute(2, 0, 1)[:-1]  # (seq_len, num_scales, num_hidden)
-            pred_cls = self.fc_cls(out).sigmoid().view(seq_len, self.num_scales)  # (seq_len, num_scales)
-            pred_loc = self.fc_loc(out).view(seq_len, self.num_scales, 2) # (seq_len, num_scales, 2)
-
-        elif self.pooling_type == 'fft':
-            pool_results = self.poolings(out) # [(seq_len, num_hidden, scale), ...]
-            pool_results = torch.stack(pool_results, dim=0)  # (num_scale, seq_len, 4, num_hidden)
-            coarse_pooling = pool_results.mean(dim=2)  # (num_scale, seq_len, num_hidden)
-            coarse_pooling = coarse_pooling.permute(1, 0, 2)  # (seq_len, num_scale, num_hidden)
-            fine_pooling = self.fc_pooling(pool_results.view(seq_len, self.num_scales, -1))
-            pred_cls = self.fc_cls(coarse_pooling).sigmoid().view(seq_len, self.num_scales)
-            pred_loc = self.fc_loc(fine_pooling).view(seq_len, self.num_scales, 2)
-
-        elif self.pooling_type == 'dwt':
-            pool_results = self.poolings(out) # [(seq_len, num_hidden, scale), ...]
-            pool_results = torch.stack(pool_results, dim=0)  # (num_scale, seq_len, 4, num_hidden)
-            coarse_pooling = pool_results.mean(dim=2)  # (num_scale, seq_len, num_hidden)
-            coarse_pooling = coarse_pooling.permute(1, 0, 2)  # (seq_len, num_scale, num_hidden)
-            fine_pooling = self.fc_pooling(pool_results.view(seq_len, self.num_scales, -1))
-            pred_cls = self.fc_cls(coarse_pooling).sigmoid().view(seq_len, self.num_scales)
-            pred_loc = self.fc_loc(fine_pooling).view(seq_len, self.num_scales, 2)
-
-
-        elif self.pooling_type == 'flat-pooling':
-            pool_results = self.poolings(out)
-            pool_results = torch.stack(pool_results, dim=0)
-            coarse_pooling = pool_results.mean(dim=2)
-            coarse_pooling = coarse_pooling.permute(1, 0, 2)
-            fine_pooling = self.fc_pooling(pool_results.view(seq_len, self.num_scales, -1))
-            pred_cls = self.fc_cls(coarse_pooling).sigmoid().view(seq_len, self.num_scales)
-            pred_loc = self.fc_loc(fine_pooling).view(seq_len, self.num_scales, 2)
+        out = out.transpose(2, 1)  # (1, num_hidden, seq_len)
+        pool_results = [roi_pooling(out) for roi_pooling in self.poolings]  # [torch.tensor(1, num_hidden, seq_len), ...]
+        out = torch.cat(pool_results, dim=0).permute(2, 0, 1)[:-1]  # (seq_len, num_scales, num_hidden)
+        pred_cls = self.fc_cls(out).sigmoid().view(seq_len, self.num_scales)  # (seq_len, num_scales)
+        pred_loc = self.fc_loc(out).view(seq_len, self.num_scales, 2) # (seq_len, num_scales, 2)
 
         return pred_cls, pred_loc
 
@@ -272,8 +243,8 @@ class DSNet_MultiAttention(nn.Module):
             nn.LayerNorm(num_hidden))
         self.fc = nn.ModuleList([self.fc_block for i in range(fc_depth)])
 
-        self.fc_cls = nn.Sequential(nn.Linear(num_hidden, num_hidden), nn.ReLU(), nn.Linear(num_hidden, 1))
-        self.fc_loc = nn.Sequential(nn.Linear(num_hidden, num_hidden), nn.ReLU(), nn.Linear(num_hidden, 2))
+        self.fc_cls = nn.Sequential(nn.Linear(num_hidden, 1))
+        self.fc_loc = nn.Sequential(nn.Linear(num_hidden, 2))
 
     def forward(self, x):
         _, seq_len, _ = x.shape
