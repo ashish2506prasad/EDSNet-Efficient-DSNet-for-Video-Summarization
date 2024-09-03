@@ -60,7 +60,7 @@ class Pooling(nn.Module):
                 for segment in segments_list
             ]
             segment_tensor = torch.cat(fft_segments, dim=0).to(x.device)
-            segment_tensor = self.fc_list[i](segment_tensor).permute(0, 2, 1)
+            segment_tensor = segment_tensor.permute(0, 2, 1)
             poolings_list.append(segment_tensor)
         return poolings_list
 
