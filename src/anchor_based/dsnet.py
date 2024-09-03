@@ -87,8 +87,8 @@ class DSNet(nn.Module):
             nn.LayerNorm(num_hidden)
             )
         self.fc = nn.ModuleList([self.fc_block for i in range(fc_depth)])
-        self.fc_cls = nn.Sequential(nn.Linear(num_hidden, num_hidden), nn.ReLU(), nn.Dropout(0.5), nn.Linear(num_hidden, 1))
-        self.fc_loc = nn.Sequential(nn.Linear(num_hidden, num_hidden), nn.ReLU(), nn.Dropout(0.5), nn.Linear(num_hidden, 2))
+        self.fc_cls = nn.Sequential(nn.Linear(num_hidden, 1))
+        self.fc_loc = nn.Sequential(nn.Linear(num_hidden, 2))
 
     def forward(self, x):
         _, seq_len, _ = x.shape

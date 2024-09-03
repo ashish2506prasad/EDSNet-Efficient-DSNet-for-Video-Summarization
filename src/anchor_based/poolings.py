@@ -55,12 +55,11 @@ class Pooling(nn.Module):
         poolings_list = []
         for i, scale in enumerate(self.scale):
             segments_list = self.segment_and_pad(x, scale)
-            fft_segments = [
-                F.normalize(fft.fft(segment.permute(0, 2, 1), dim=-1).real, dim=-1)
-                for segment in segments_list
+            fft_segments = [ fft.fft(segment, dim=1).real   # [(1, scale, num_hidden), (1, scale, num_hidden)]
+                    for segment in segments_list
             ]
             segment_tensor = torch.cat(fft_segments, dim=0).to(x.device)
-            segment_tensor = segment_tensor.permute(0, 2, 1)
+            segment_tensor = segment_tensor
             poolings_list.append(segment_tensor)
         return poolings_list
 
