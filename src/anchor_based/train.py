@@ -65,6 +65,7 @@ def train(args, split, save_path):
     epoch_list = []
     f1_score_list = []
     loss_list = []
+    time_list = []
 
     for epoch in range(args.max_epoch):
         start = time.time()
@@ -133,6 +134,7 @@ def train(args, split, save_path):
         # print(f"Total videos with NaN conversion error: {nan_conversion_errors}")
 
         end = time.time()
+        time_list.append(end - start)
 
         val_fscore, _ =  evaluate(model, val_loader, args.nms_thresh, args.device)
         f1_score_list.append(val_fscore)
@@ -142,18 +144,21 @@ def train(args, split, save_path):
             max_val_fscore = val_fscore
             torch.save(model.state_dict(), str(save_path))
 
-        if epoch % 20 == 0:
+        if epoch % 30 == 0:
             if args.where == 'local':
                 logger.info(f'Epoch: {epoch}/{args.max_epoch} '
                             f'Loss: {stats.cls_loss:.4f}/{stats.loc_loss:.4f}/{stats.loss:.4f} '
                             f'F-score cur/max: {val_fscore:.4f}/{max_val_fscore:.4f}'
-                            f'Time: {end-start:.4f}')
+                            )
             else:
                 print(f'Epoch: {epoch}/{args.max_epoch} '
-                            f'Loss: {stats.cls_loss:.4f}/{stats.loc_loss:.4f}/{stats.loss:.4f} '
-                            f'F-score cur/max: {val_fscore:.4f}/{max_val_fscore:.4f}'
-                            f'Time: {end-start:.4f}')
-    
+                      f'Loss: {stats.cls_loss:.4f}/{stats.loc_loss:.4f}/{stats.loss:.4f} '
+                      f'F-score cur/max: {val_fscore:.4f}/{max_val_fscore:.4f}'
+                      )
+    time_taken = np.array(time_list)
+    print(f"avg time taken: {time_taken.mean()}",
+          f"max time taken: {time_taken.max()}",
+          f"min time taken: {time_taken.min()}")
                 
     plt.plot(epoch_list, f1_score_list)
     plt.show()
