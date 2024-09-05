@@ -82,7 +82,7 @@ class Pooling(nn.Module):
             self.fc = nn.Sequential(nn.Linear(num_hidden * scale[0], num_hidden), nn.GELU())
 
     def dwt(self, x):
-        assert self.scale == 8
+        # assert self.scale == 8
         pooled = []
         coarse_pooling = []
         for i in range(x.shape[1]):
