@@ -96,7 +96,7 @@ class Pooling(nn.Module):
             pooled.append(coeffs)
             coarse_pooling.append(coeffs.mean(dim=1))
 
-        fine_pooling = torch.stack(pooled, dim=1).view(1, x.shape[1], 4 * x.shape[2]).to(x.device)
+        fine_pooling = torch.stack(pooled, dim=1).view(1, x.shape[1], self.scale * x.shape[2]//2).to(x.device)
         coarse_pooling = torch.stack(coarse_pooling, dim=1).to(x.device)
         return coarse_pooling, self.fc(fine_pooling)
 

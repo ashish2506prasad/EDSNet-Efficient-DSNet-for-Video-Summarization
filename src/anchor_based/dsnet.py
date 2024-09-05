@@ -256,8 +256,6 @@ class DSNet_MultiAttention(nn.Module):
         pool_results = [roi_pooling(out) for roi_pooling in self.roi_poolings]
         out = torch.cat(pool_results, dim=0).permute(2, 0, 1)[:-1]
 
-        out = self.fc1(out)
-
         pred_cls = self.fc_cls(out).sigmoid().view(seq_len, self.num_scales)
         pred_loc = self.fc_loc(out).view(seq_len, self.num_scales, 2)
 
