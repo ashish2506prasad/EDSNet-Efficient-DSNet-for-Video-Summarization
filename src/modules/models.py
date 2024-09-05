@@ -3,8 +3,13 @@ import math
 import torch
 from torch import nn
 from transformer.nystroformer import NystromAttention
-from modules.f_net_inspired.fourier_attention import FNet_layer
+from modules.frequency_inspired.fourier_attention import FNet_layer
 # from mamba_ssm import Mamba
+from transformer.linformer import Linformer
+from transformer.performer import Performer
+from modules.frequency_inspired.dwt_attention import DwtNet
+
+    
 
 class ScaledDotProductAttention(nn.Module):
     def __init__(self, d_k):
@@ -132,6 +137,12 @@ def build_base_model(base_type: str,
         base_model = NystromAttention(dim=num_feature, dim_head = 64, heads = num_head, num_landmarks = 64, pinv_iterations = 6,residual = True,residual_conv_kernel = 33)
     elif base_type == 'fourier':
         base_model = FNet_layer(num_feature, dropout=0.5, orientation=orientation)
+    # elif base_type == 'linformer':
+    #     base_model = Linformer(dim=num_feature, depth=1, heads=num_head, dim_head=64, seq_len=5000, k=1000, one_kv_head=False, share_kv=False, dropout=0.5, mlp_dim=1024)
+    elif base_type == 'performer':
+        base_model = Performer(dim=num_feature, depth=1, heads=num_head, mlp_dim=1024, dim_head=64, dropout=0.5)
+    elif base_type == 'dwt':
+        base_model = DwtNet(num_feature=num_feature, wavelet='haar', dropout=0.5)
     else:
         raise ValueError(f'Invalid base model {base_type}')
 

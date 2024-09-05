@@ -35,7 +35,7 @@ def get_parser() -> argparse.ArgumentParser:
     parser.add_argument('model', type=str,
                         choices=('anchor-based', 'anchor-free'))
     parser.add_argument('--model-depth', type=str, default='shallow',
-                        choices=['shallow', 'deep', 'local-global-attention', 'cross-attention', 'original'])
+                        choices=['shallow', 'deep', 'local-global-attention', 'original'])
     parser.add_argument('--orientation', type=str, choices=['paper', 'temporal', 'feature_wise'], default='paper')
     parser.add_argument('--pooling-type', type=str, default = 'roi', choices=['roi', 'flat-pooling', 'fft', 'dwt'])
 
@@ -65,7 +65,7 @@ def get_parser() -> argparse.ArgumentParser:
     # common model config
     parser.add_argument('--base-model', type=str, default='attention',
                         choices=['attention', 'lstm', 'linear', 'bilstm',
-                                 'gcn', 'nystromformer', 'fourier'])
+                                 'gcn', 'nystromformer', 'fourier', 'linformer', 'performer', 'dwt'])
     parser.add_argument('--num-head', type=int, default=8)
     parser.add_argument('--num-feature', type=int, default=1024)
     parser.add_argument('--num-hidden', type=int, default=128)
