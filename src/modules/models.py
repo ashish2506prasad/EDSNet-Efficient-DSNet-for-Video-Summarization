@@ -4,8 +4,6 @@ import torch
 from torch import nn
 from transformer.nystroformer import NystromAttention
 from modules.frequency_inspired.fourier_attention import FNet_layer
-# from mamba_ssm import Mamba
-# from transformer.linformer import Linformer
 from transformer.performer import Performer
 from modules.frequency_inspired.dwt_attention import DwtNet
 
