@@ -3,7 +3,6 @@ from os import PathLike
 from pathlib import Path
 from typing import Any, List, Dict
 import os
-import logging
 from helpers import init_helper 
 import h5py
 import numpy as np
@@ -32,11 +31,6 @@ class VideoDataset(object):
         user_summary = None
         if 'user_summary' in video_file:
             user_summary = video_file['user_summary'][...].astype(np.float32)
-        
-        # # if motion feature is available
-        # motion_features = None
-        # if 'motion_features' in video_file:
-        #     motion_features = video_file['motion_features'][...].astype(np.float32)
 
         gtscore -= gtscore.min()
         gtscore /= gtscore.max()
@@ -53,9 +47,15 @@ class VideoDataset(object):
             datasets = {path: h5py.File(os.path.join('/kaggle/input/video-features','/'.join(path.split('/')[2:]) ), 'r') for path in dataset_paths}
             return datasets
         elif where == 'local':
-            dataset_paths = {str(Path(key).parent) for key in keys}
-            datasets = {path: h5py.File(os.path.join('/mnt/d/Ashish/EE 691/DSNet_Kaggle','/'.join(path.split('/')[1:]) ), 'r') for path in dataset_paths}
+            try:
+                dataset_paths = {str(Path(key).parent) for key in keys}
+                datasets = {path: h5py.File(os.path.join('/mnt/d/Ashish/EE 691/DSNet_Kaggle','/'.join(path.split('/')[1:]) ), 'r') for path in dataset_paths}
+            except:
+                dataset_paths = {str(Path(key).parent) for key in keys}
+                datasets = {path: h5py.File(os.path.join('DSNet_Kaggle','/'.join(path.split('/')[1:]) ), 'r') for path in dataset_paths}
             return datasets
+            
+
 
 class DataLoader(object):
     def __init__(self, dataset: VideoDataset, shuffle: bool):
