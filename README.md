@@ -189,17 +189,3 @@ We gratefully thank the below open-source repo, which greatly boost our research
 + Thank [DR-DSN](https://github.com/KaiyangZhou/pytorch-vsumm-reinforce) for the pre-processed public datasets.
 + Thank [VASNet](https://github.com/ok1zjf/VASNet) for the training and evaluation pipeline.
 
-## Citation
-
-If you find our codes or paper helpful, please consider citing.
-
-```
-@article{zhu2020dsnet,
-  title={DSNet: A Flexible Detect-to-Summarize Network for Video Summarization},
-  author={Zhu, Wencheng and Lu, Jiwen and Li, Jiahao and Zhou, Jie},
-  journal={IEEE Transactions on Image Processing},
-  volume={30},
-  pages={948--962},
-  year={2020}
-}
-```
