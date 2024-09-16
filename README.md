@@ -1,11 +1,4 @@
-# DSNet: A Flexible Detect-to-Summarize Network for Video Summarization [[paper]](https://ieeexplore.ieee.org/document/9275314)
-
-[![UnitTest](https://github.com/li-plus/DSNet/workflows/UnitTest/badge.svg)](https://github.com/li-plus/DSNet/actions)
-[![License: MIT](https://img.shields.io/badge/license-MIT-blue)](https://github.com/li-plus/DSNet/blob/main/LICENSE)
-
-![framework](docs/framework.jpg)
-
-A PyTorch implementation of our paper [DSNet: A Flexible Detect-to-Summarize Network for Video Summarization](https://ieeexplore.ieee.org/document/9275314) by [Wencheng Zhu](https://woshiwencheng.github.io/), [Jiwen Lu](http://ivg.au.tsinghua.edu.cn/Jiwen_Lu/), [Jiahao Li](https://github.com/li-plus), and [Jie Zhou](http://www.au.tsinghua.edu.cn/info/1078/1635.htm). Published in [IEEE Transactions on Image Processing](https://ieeexplore.ieee.org/xpl/RecentIssue.jsp?punumber=83).
+# Ashish - vid - summarization
 
 ## Getting Started
 
