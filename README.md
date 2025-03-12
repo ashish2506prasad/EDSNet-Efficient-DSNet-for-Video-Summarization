@@ -1,20 +1,23 @@
-# Ashish - vid - summarization
+# EDSNet: Efficient-DSNet for Video Summarization
 
 ## Getting Started
-
-This project is developed on Ubuntu 16.04 with CUDA 9.0.176.
 
 First, clone this project to your local environment.
 
 ```sh
-git clone https://github.com/li-plus/DSNet.git
+git clone https://github.com/ashish2506prasad/EDSNet-Efficient-DSNet-for-Video-Summarization
 ```
 
 Create a virtual environment with python 3.6, preferably using [Anaconda](https://www.anaconda.com/).
 
 ```sh
-conda create --name dsnet python=3.6
+conda create --name edsnet python=3.6
 conda activate dsnet
+```
+or 
+```sh
+pip -m venv edsnet
+edsnet/Scripts/activate
 ```
 
 Install python dependencies.
@@ -35,13 +38,12 @@ unzip dsnet_datasets.zip
 
 If the Dropbox link is unavailable to you, try downloading from below links.
 
-+ (Baidu Cloud) Link: https://pan.baidu.com/s/1LUK2aZzLvgNwbK07BUAQRQ Extraction Code: x09b
-+ (Google Drive) https://drive.google.com/file/d/11ulsvk1MZI7iDqymw9cfL7csAYS0cDYH/view?usp=sharing
++ (kaggle) https://www.kaggle.com/datasets/meashish2003/vid-features/data
 
 Now the datasets structure should look like
 
 ```
-DSNet
+EDSNet
 └── datasets/
     ├── eccv16_dataset_ovp_google_pool5.h5
     ├── eccv16_dataset_summe_google_pool5.h5
