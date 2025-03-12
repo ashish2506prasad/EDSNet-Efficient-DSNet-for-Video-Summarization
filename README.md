@@ -30,12 +30,6 @@ pip install -r requirements.txt
 
 Download the pre-processed datasets into `datasets/` folder, including [TVSum](https://github.com/yalesong/tvsum), [SumMe](https://gyglim.github.io/me/vsum/index.html), [OVP](https://sites.google.com/site/vsummsite/download), and [YouTube](https://sites.google.com/site/vsummsite/download) datasets.
 
-```sh
-mkdir -p datasets/ && cd datasets/
-wget https://www.dropbox.com/s/tdknvkpz1jp6iuz/dsnet_datasets.zip
-unzip dsnet_datasets.zip
-```
-
 If the Dropbox link is unavailable to you, try downloading from below links.
 
 + (kaggle) https://www.kaggle.com/datasets/meashish2003/vid-features/data
@@ -51,36 +45,8 @@ EDSNet
     ├── eccv16_dataset_youtube_google_pool5.h5
     └── readme.txt
 ```
-
-## Pre-trained Models
-
-Our pre-trained models are now available online. You may download them for evaluation, or you may skip this section and train a new one from scratch.
-
-```sh
-mkdir -p models && cd models
-# anchor-based model
-wget https://www.dropbox.com/s/0jwn4c1ccjjysrz/pretrain_ab_basic.zip
-unzip pretrain_ab_basic.zip
-# anchor-free model
-wget https://www.dropbox.com/s/2hjngmb0f97nxj0/pretrain_af_basic.zip
-unzip pretrain_af_basic.zip
-```
-
-To evaluate our pre-trained models, type:
-
-```sh
-# evaluate anchor-based model
-python evaluate.py anchor-based --model-dir ../models/pretrain_ab_basic/ --splits ../splits/tvsum.yml ../splits/summe.yml
-# evaluate anchor-free model
-python evaluate.py anchor-free --model-dir ../models/pretrain_af_basic/ --splits ../splits/tvsum.yml ../splits/summe.yml --nms-thresh 0.4
-```
-
-If everything works fine, you will get similar F-score results as follows.
-
-|              | TVSum | SumMe |
-| ------------ | ----- | ----- |
-| Anchor-based | 62.05 | 50.19 |
-| Anchor-free  | 61.86 | 51.18 |
+## Results
+![image](https://github.com/user-attachments/assets/af83f2aa-285e-49af-a467-48ed3ee84499)
 
 ## Training
 
