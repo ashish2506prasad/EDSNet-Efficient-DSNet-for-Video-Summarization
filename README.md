@@ -148,5 +148,5 @@ We gratefully thank the below open-source repo, which greatly boost our research
 
 + Thank [KTS](https://github.com/pathak22/videoseg/tree/master/lib/kts) for the effective shot generation algorithm.
 + Thank [DR-DSN](https://github.com/KaiyangZhou/pytorch-vsumm-reinforce) for the pre-processed public datasets.
-+ Thank [VASNet](https://github.com/ok1zjf/VASNet) for the training and evaluation pipeline.
++ Thank [VASNet](https://github.com/ok1zjf/VASNet) and [DSNet](https://github.com/li-plus/DSNet) for the training and evaluation pipeline.
 
