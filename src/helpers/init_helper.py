@@ -6,6 +6,10 @@ from pathlib import Path
 import numpy as np
 import torch
 
+"""
+You might have to change the directories in the following functions to match the directories in your local machine/kaggle
+"""
+
 
 def set_random_seed(seed: int) -> None:
     random.seed(seed)
@@ -33,10 +37,10 @@ def get_parser() -> argparse.ArgumentParser:
 
     # model type
     parser.add_argument('model', type=str,
-                        choices=('anchor-based', 'anchor-free'))
+                        choices=('anchor-based'))
     parser.add_argument('--model-depth', type=str, default='shallow',
                         choices=['shallow', 'deep', 'local-global-attention', 'original'])
-    parser.add_argument('--orientation', type=str, choices=['paper', 'temporal', 'feature_wise'], default='paper')
+    parser.add_argument('--fft-attention-orientation', type=str, choices=['paper', 'temporal', 'feature_wise'], default='paper')  # orientation as given in fnet paper
     parser.add_argument('--pooling-type', type=str, default = 'roi', choices=['roi', 'flat-pooling', 'fft', 'dwt'])
 
     # training & evaluation
@@ -87,7 +91,7 @@ def get_parser() -> argparse.ArgumentParser:
     parser.add_argument('--reg-loss', type=str, default='soft-iou',
                         choices=['soft-iou', 'smooth-l1'])
     
-    parser.add_argument('--where', type=str, choices = ['kaggle', 'local'], default = 'local')
+    parser.add_argument('--where', type=str, choices = ['kaggle', 'local'], default = 'local')  # this repo can be run on kaggle as well, so this argument is added to handle the difference in file paths
 
     return parser
 
