@@ -1,4 +1,5 @@
 # EDSNet: Efficient-DSNet for Video Summarization
+This is the official repository of [EDSNet: Efficient-DSNet for Video Summarization](https://arxiv.org/pdf/2409.14724)
 
 ## Getting Started
 
