@@ -8,8 +8,7 @@ First, clone this project to your local environment.
 git clone https://github.com/ashish2506prasad/EDSNet-Efficient-DSNet-for-Video-Summarization
 ```
 
-Create a virtual environment with python 3.6, preferably using [Anaconda](https://www.anaconda.com/).
-
+Create a virtual environment with python.
 ```sh
 conda create --name edsnet python=3.6
 conda activate dsnet
@@ -19,7 +18,6 @@ or
 pip -m venv edsnet
 edsnet/Scripts/activate
 ```
-
 Install python dependencies.
 
 ```sh
@@ -55,16 +53,21 @@ EDSNet
 To train anchor-based attention model on TVSum and SumMe datasets with canonical settings, run
 
 ```sh
-python train.py anchor-based --model-dir ../models/ab_basic --splits ../splits/tvsum.yml ../splits/summe.yml
+python train.py anchor-based --model-dir ../models/ab_basic --splits ../splits/tvsum.yml ../splits/summe.yml --base_model nystromformer --pooling_type roi --anchor_scales 12
+```
+To obtain the number of parameters run
+```sh
+python printing_model_information.py anchor-based --model-dir ../models/ab_basic --splits ../splits/tvsum.yml --base_model nystromformer --pooling_type roi --anchor_scales 12
 ```
 
 To train on augmented and transfer datasets, run
 
 ```sh
-python train.py anchor-based --model-dir ../models/ab_tvsum_aug/ --splits ../splits/tvsum_aug.yml
-python train.py anchor-based --model-dir ../models/ab_summe_aug/ --splits ../splits/summe_aug.yml
-python train.py anchor-based --model-dir ../models/ab_tvsum_trans/ --splits ../splits/tvsum_trans.yml
-python train.py anchor-based --model-dir ../models/ab_summe_trans/ --splits ../splits/summe_trans.yml
+python train.py anchor-based --model-dir ../models/ab_tvsum_aug/ --splits ../splits/tvsum_aug.yml --base_model nystromformer --pooling_type roi --anchor_scales 12
+python train.py anchor-based --model-dir ../models/ab_tvsum_aug/ --splits ../splits/summe_aug.yml --base_model nystromformer --pooling_type roi --anchor_scales 12
+
+python train.py anchor-based --model-dir ../models/ab_tvsum_aug/ --splits ../splits/tvsum_trans.yml --base_model nystromformer --pooling_type roi --anchor_scales 12
+python train.py anchor-based --model-dir ../models/ab_tvsum_aug/ --splits ../splits/summe_trans.yml --base_model nystromformer --pooling_type roi --anchor_scales 12
 ```
 
 To train with LSTM, Bi-LSTM or GCN feature extractor, specify the `--base-model` argument as `lstm`, `bilstm`, or `gcn`. For example,
@@ -73,15 +76,7 @@ To train with LSTM, Bi-LSTM or GCN feature extractor, specify the `--base-model`
 python train.py anchor-based --model-dir ../models/ab_basic --splits ../splits/tvsum.yml ../splits/summe.yml --base-model lstm
 ```
 
-### Anchor-free
-
-Much similar to anchor-based models, to train on canonical TVSum and SumMe, run
-
-```sh
-python train.py anchor-free --model-dir ../models/af_basic --splits ../splits/tvsum.yml ../splits/summe.yml --nms-thresh 0.4
-```
-
-Note that NMS threshold is set to 0.4 for anchor-free models.
+for more training settings, refer `src/helpers/init_helper.py`
 
 ## Evaluation
 
@@ -89,12 +84,6 @@ To evaluate your anchor-based models, run
 
 ```sh
 python evaluate.py anchor-based --model-dir ../models/ab_basic/ --splits ../splits/tvsum.yml ../splits/summe.yml
-```
-
-For anchor-free models, remember to specify NMS threshold as 0.4.
-
-```sh
-python evaluate.py anchor-free --model-dir ../models/af_basic/ --splits ../splits/tvsum.yml ../splits/summe.yml --nms-thresh 0.4
 ```
 
 ## Generating Shots with KTS
